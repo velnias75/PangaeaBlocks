@@ -1,0 +1,4 @@
+main: de.rangun.pangaeablocks.PangaeaBlocksPlugin
+name: PangaeaBlocks
+version: '@version@'
+api-version: '1.18'

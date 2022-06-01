@@ -1,0 +1,28 @@
+import org.apache.tools.ant.filters.ReplaceTokens
+
+plugins {
+    id 'java'
+}
+
+apply plugin: 'java'
+
+version = '0.0-SNAPSHOT'
+
+repositories {
+    maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+}
+
+dependencies {
+    compileOnly("io.papermc.paper:paper-api:${project.paper_version}")
+}
+
+java {
+    toolchain.languageVersion.set(JavaLanguageVersion.of(17))
+}
+
+processResources {
+    from(sourceSets.main.resources.srcDirs) {
+	duplicatesStrategy = 'include'
+        filter ReplaceTokens, tokens: [version: version]
+    }
+}
