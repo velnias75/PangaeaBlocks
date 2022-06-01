@@ -17,29 +17,23 @@
  * along with PangaeaBlocks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.rangun.pangaeablocks;
+package de.rangun.pangaeablocks.db;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import java.util.logging.Level;
 
-import de.rangun.pangaeablocks.commands.LockCommand;
-import de.rangun.pangaeablocks.db.Database;
-import de.rangun.pangaeablocks.db.SQLite;
-import de.rangun.pangaeablocks.listener.BlockBreakListener;
-import de.rangun.pangaeablocks.listener.PlayerInteractListener;
+import org.bukkit.plugin.Plugin;
 
-public final class PangaeaBlocksPlugin extends JavaPlugin {
+/**
+ * @author heiko
+ *
+ */
+final class Error {
 
-	private Database db;
+	public static void execute(Plugin plugin, Exception ex) {
+		plugin.getLogger().log(Level.SEVERE, "Couldn't execute MySQL statement: ", ex);
+	}
 
-	@Override
-	public void onEnable() {
-
-		this.db = new SQLite(this);
-		this.db.load();
-
-		getCommand("lock").setExecutor(new LockCommand(db));
-
-		getServer().getPluginManager().registerEvents(new PlayerInteractListener(db), this);
-		getServer().getPluginManager().registerEvents(new BlockBreakListener(db), this);
+	public static void close(Plugin plugin, Exception ex) {
+		plugin.getLogger().log(Level.SEVERE, "Failed to close MySQL connection: ", ex);
 	}
 }

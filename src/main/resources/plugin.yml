@@ -2,3 +2,7 @@ main: de.rangun.pangaeablocks.PangaeaBlocksPlugin
 name: PangaeaBlocks
 version: '@version@'
 api-version: '1.18'
+commands:
+  lock:
+    description: enables the player to just fly unlimited.
+    usage: /lock

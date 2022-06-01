@@ -17,29 +17,27 @@
  * along with PangaeaBlocks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.rangun.pangaeablocks;
+package de.rangun.pangaeablocks.db;
 
-import org.bukkit.plugin.java.JavaPlugin;
+/**
+ * @author heiko
+ *
+ */
+final class Errors {
 
-import de.rangun.pangaeablocks.commands.LockCommand;
-import de.rangun.pangaeablocks.db.Database;
-import de.rangun.pangaeablocks.db.SQLite;
-import de.rangun.pangaeablocks.listener.BlockBreakListener;
-import de.rangun.pangaeablocks.listener.PlayerInteractListener;
+	public static String sqlConnectionExecute() {
+		return "Couldn't execute MySQL statement: ";
+	}
 
-public final class PangaeaBlocksPlugin extends JavaPlugin {
+	public static String sqlConnectionClose() {
+		return "Failed to close MySQL connection: ";
+	}
 
-	private Database db;
+	public static String noSQLConnection() {
+		return "Unable to retreive MYSQL connection: ";
+	}
 
-	@Override
-	public void onEnable() {
-
-		this.db = new SQLite(this);
-		this.db.load();
-
-		getCommand("lock").setExecutor(new LockCommand(db));
-
-		getServer().getPluginManager().registerEvents(new PlayerInteractListener(db), this);
-		getServer().getPluginManager().registerEvents(new BlockBreakListener(db), this);
+	public static String noTableFound() {
+		return "Database Error: No Table Found";
 	}
 }

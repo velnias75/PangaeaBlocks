@@ -17,29 +17,23 @@
  * along with PangaeaBlocks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.rangun.pangaeablocks;
+package de.rangun.pangaeablocks.utils;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.Bisected.Half;
+import org.bukkit.block.data.type.Door;
 
-import de.rangun.pangaeablocks.commands.LockCommand;
-import de.rangun.pangaeablocks.db.Database;
-import de.rangun.pangaeablocks.db.SQLite;
-import de.rangun.pangaeablocks.listener.BlockBreakListener;
-import de.rangun.pangaeablocks.listener.PlayerInteractListener;
+/**
+ * @author heiko
+ *
+ */
+public final class LocationUtils {
 
-public final class PangaeaBlocksPlugin extends JavaPlugin {
+	public static Block doorLocation(final Block block) {
 
-	private Database db;
-
-	@Override
-	public void onEnable() {
-
-		this.db = new SQLite(this);
-		this.db.load();
-
-		getCommand("lock").setExecutor(new LockCommand(db));
-
-		getServer().getPluginManager().registerEvents(new PlayerInteractListener(db), this);
-		getServer().getPluginManager().registerEvents(new BlockBreakListener(db), this);
+		return block.getBlockData() instanceof Door && Half.TOP.equals(((Door) block.getBlockData()).getHalf())
+				? block.getRelative(BlockFace.DOWN)
+				: block;
 	}
 }

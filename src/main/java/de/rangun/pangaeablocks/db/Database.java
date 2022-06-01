@@ -17,29 +17,24 @@
  * along with PangaeaBlocks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.rangun.pangaeablocks;
+package de.rangun.pangaeablocks.db;
 
-import org.bukkit.plugin.java.JavaPlugin;
+import java.util.UUID;
 
-import de.rangun.pangaeablocks.commands.LockCommand;
-import de.rangun.pangaeablocks.db.Database;
-import de.rangun.pangaeablocks.db.SQLite;
-import de.rangun.pangaeablocks.listener.BlockBreakListener;
-import de.rangun.pangaeablocks.listener.PlayerInteractListener;
+import org.bukkit.block.Block;
 
-public final class PangaeaBlocksPlugin extends JavaPlugin {
+/**
+ * @author heiko
+ *
+ */
+public interface Database {
 
-	private Database db;
+	void load();
 
-	@Override
-	public void onEnable() {
+	UUID getBlock(Block block);
 
-		this.db = new SQLite(this);
-		this.db.load();
+	void registerBlock(Block block, UUID uuid);
 
-		getCommand("lock").setExecutor(new LockCommand(db));
+	void deleteBlock(Block block);
 
-		getServer().getPluginManager().registerEvents(new PlayerInteractListener(db), this);
-		getServer().getPluginManager().registerEvents(new BlockBreakListener(db), this);
-	}
 }
