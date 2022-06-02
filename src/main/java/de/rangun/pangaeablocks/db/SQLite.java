@@ -51,7 +51,7 @@ public final class SQLite extends AbstractDatabase {
 				"y"	INTEGER NOT NULL,
 				"z"	INTEGER NOT NULL,
 				"world"	VARCHAR NOT NULL,
-				"uuid"	VARCHAR
+				"uuid"	VARCHAR DEFAULT NULL
 			);
 			""" + """
 			CREATE INDEX IF NOT EXISTS "location" ON blocks (

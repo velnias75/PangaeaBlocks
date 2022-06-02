@@ -21,7 +21,7 @@ package de.rangun.pangaeablocks;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
-import de.rangun.pangaeablocks.commands.LockCommand;
+import de.rangun.pangaeablocks.commands.LockDoorCommand;
 import de.rangun.pangaeablocks.db.Database;
 import de.rangun.pangaeablocks.db.SQLite;
 import de.rangun.pangaeablocks.listener.BlockBreakListener;
@@ -37,7 +37,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin {
 		this.db = new SQLite(this);
 		this.db.load();
 
-		getCommand("lock").setExecutor(new LockCommand(db));
+		getCommand("lockdoor").setExecutor(new LockDoorCommand(db));
 
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(db), this);
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(db), this);

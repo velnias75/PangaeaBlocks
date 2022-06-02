@@ -30,7 +30,7 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 
 import de.rangun.pangaeablocks.db.Database;
-import de.rangun.pangaeablocks.utils.LocationUtils;
+import de.rangun.pangaeablocks.utils.Utils;
 
 /**
  * @author heiko
@@ -55,7 +55,7 @@ public final class PlayerInteractListener implements Listener {
 
 		if (block.getBlockData() instanceof Openable && action.isRightClick()) {
 
-			final UUID uuid = db.getBlock(LocationUtils.doorLocation(block));
+			final UUID uuid = db.getBlock(Utils.doorBottom(block));
 
 			if (uuid != null) {
 

@@ -28,7 +28,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
 import de.rangun.pangaeablocks.db.Database;
-import de.rangun.pangaeablocks.utils.LocationUtils;
+import de.rangun.pangaeablocks.utils.Utils;
 
 /**
  * @author heiko
@@ -49,7 +49,7 @@ public final class BlockBreakListener implements Listener {
 
 		if (block.getBlockData() instanceof Openable) {
 
-			final Block locBlock = LocationUtils.doorLocation(block);
+			final Block locBlock = Utils.doorBottom(block);
 			final UUID uuid = db.getBlock(locBlock);
 
 			if (uuid != null) {

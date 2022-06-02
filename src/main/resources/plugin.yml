@@ -1,8 +1,12 @@
 main: de.rangun.pangaeablocks.PangaeaBlocksPlugin
 name: PangaeaBlocks
+author: Velnias75
+website: https://discord.gg/kQP9QSG6F4
 version: '@version@'
 api-version: '1.18'
 commands:
-  lock:
-    description: enables the player to just fly unlimited.
-    usage: /lock
+  lockdoor:
+    description: locks resp. protects a door/gate/trapdoor
+    permission: pangaeablocks.lockdoor
+    usage: /lockdoor
+ 

@@ -28,12 +28,19 @@ import org.bukkit.block.data.type.Door;
  * @author heiko
  *
  */
-public final class LocationUtils {
+public final class Utils {
 
-	public static Block doorLocation(final Block block) {
+	public static Block doorBottom(final Block block) {
 
 		return block.getBlockData() instanceof Door && Half.TOP.equals(((Door) block.getBlockData()).getHalf())
 				? block.getRelative(BlockFace.DOWN)
+				: block;
+	}
+
+	public static Block doorTop(final Block block) {
+
+		return block.getBlockData() instanceof Door && Half.BOTTOM.equals(((Door) block.getBlockData()).getHalf())
+				? block.getRelative(BlockFace.UP)
 				: block;
 	}
 }

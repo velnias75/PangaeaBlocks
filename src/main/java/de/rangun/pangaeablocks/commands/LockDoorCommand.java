@@ -19,6 +19,7 @@
 
 package de.rangun.pangaeablocks.commands;
 
+import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Openable;
 import org.bukkit.command.Command;
@@ -26,18 +27,22 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import com.destroystokyo.paper.ParticleBuilder;
+
 import de.rangun.pangaeablocks.db.Database;
-import de.rangun.pangaeablocks.utils.LocationUtils;
+import de.rangun.pangaeablocks.utils.Utils;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 
 /**
  * @author heiko
  *
  */
-public final class LockCommand implements CommandExecutor {
+public final class LockDoorCommand implements CommandExecutor {
 
 	private final Database db;
 
-	public LockCommand(Database db) {
+	public LockDoorCommand(Database db) {
 		this.db = db;
 	}
 
@@ -50,7 +55,18 @@ public final class LockCommand implements CommandExecutor {
 			final Block block = player.getTargetBlockExact(16);
 
 			if (block != null && block.getBlockData() instanceof Openable) {
-				db.registerBlock(LocationUtils.doorLocation(block), player.getUniqueId());
+
+				db.registerBlock(Utils.doorBottom(block), player.getUniqueId());
+
+				(new ParticleBuilder(Particle.HEART)).allPlayers().count(1).offset(0.0d, 0.0d, 0.0d)
+						.location(Utils.doorTop(block).getLocation().add(0.5d, 1.25d, 0.5d)).spawn();
+
+				sender.sendMessage(Component.text().color(NamedTextColor.DARK_GREEN)
+						.append(Component.translatable(block.getType())).append(Component.text(" at "))
+						.append(Component.text(block.getX())).append(Component.text(", "))
+						.append(Component.text(block.getY())).append(Component.text(", "))
+						.append(Component.text(block.getZ())).append(Component.text(" locked to "))
+						.append(Component.text(player.getName())));
 			}
 		}
 
