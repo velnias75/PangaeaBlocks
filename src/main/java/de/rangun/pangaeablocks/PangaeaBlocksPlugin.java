@@ -27,6 +27,7 @@ import de.rangun.pangaeablocks.db.Database;
 import de.rangun.pangaeablocks.db.SQLite;
 import de.rangun.pangaeablocks.listener.BlockBreakListener;
 import de.rangun.pangaeablocks.listener.PlayerInteractListener;
+import de.rangun.pangaeablocks.listener.VehicleExitListener;
 
 public final class PangaeaBlocksPlugin extends JavaPlugin {
 
@@ -41,7 +42,8 @@ public final class PangaeaBlocksPlugin extends JavaPlugin {
 		getCommand("lockdoor").setExecutor(new LockDoorCommand(db));
 		getCommand("unlockdoor").setExecutor(new UnlockDoorCommand(db));
 
-		getServer().getPluginManager().registerEvents(new PlayerInteractListener(db), this);
+		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
+		getServer().getPluginManager().registerEvents(new VehicleExitListener(this), this);
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(db), this);
 	}
 
