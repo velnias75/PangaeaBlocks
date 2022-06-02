@@ -40,32 +40,47 @@ public final class SQLite extends AbstractDatabase {
 	public SQLite(Plugin instance) {
 
 		super(instance);
-		this.dbname = plugin.getConfig().getString("SQLite.Filename", "block_registry"); // Set the table name here e.g
-																							// player_kills
+		this.dbname = plugin.getConfig().getString("SQLite.Filename", "block_registry");
 	}
 
 	private final static String createBlockTable = """
+			PRAGMA foreign_keys = ON;
 			CREATE TABLE IF NOT EXISTS "blocks" (
-				"id"	INTEGER PRIMARY KEY AUTOINCREMENT UNIQUE,
-				"x"	INTEGER NOT NULL,
-				"y"	INTEGER NOT NULL,
-				"z"	INTEGER NOT NULL,
-				"world"	VARCHAR NOT NULL,
-				"uuid"	VARCHAR DEFAULT NULL
+				"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+				"x"		INTEGER NOT NULL,
+				"y"		INTEGER NOT NULL,
+				"z"		INTEGER NOT NULL,
+				"world" VARCHAR NOT NULL,
+				UNIQUE("x", "y", "z", "world")
 			);
-			""" + """
-			CREATE INDEX IF NOT EXISTS "location" ON blocks (
+			CREATE TABLE IF NOT EXISTS "players" (
+				"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+				"uuid" VARCHAR NOT NULL,
+				UNIQUE("uuid")
+			);
+			CREATE TABLE IF NOT EXISTS "blocks_players" (
+				"player_id" INTEGER NOT NULL,
+				"block_id" INTEGER NOT NULL,
+				UNIQUE("player_id", "block_id"),
+				FOREIGN KEY ("block_id") REFERENCES "blocks" ("id") ON DELETE CASCADE
+			);
+			CREATE INDEX IF NOT EXISTS "bp" ON "blocks_players" (
+				"player_id",
+				"block_id"
+			);
+			CREATE INDEX IF NOT EXISTS "location" ON "blocks" (
+				"world",
 				"x",
 				"y",
-				"z",
-				"world"
+				"z"
 			);
-			""" + """
-			CREATE UNIQUE INDEX IF NOT EXISTS "unique_block" ON "blocks" (
-				"x",
-				"y",
-				"z",
-				"world");
+			CREATE INDEX IF NOT EXISTS "uuid" ON "players" (
+				"uuid"
+			);
+			""";
+
+	private final static String cleanupPlayers = """
+			DELETE FROM players AS d WHERE EXISTS (SELECT * FROM players AS S LEFT JOIN blocks_players ON blocks_players.player_id = S.id WHERE player_id IS NULL AND D.id = S.id);
 			""";
 
 	@Override
@@ -106,7 +121,7 @@ public final class SQLite extends AbstractDatabase {
 	}
 
 	@Override
-	public void load() {
+	public void open() {
 
 		connection = getSQLConnection();
 
@@ -124,4 +139,33 @@ public final class SQLite extends AbstractDatabase {
 		initialize();
 	}
 
+	@Override
+	public void close() {
+
+		try {
+			connection.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+
+	@Override
+	public void vacuum() {
+
+		try {
+
+			final Statement cleanUp = connection.createStatement();
+
+			cleanUp.executeUpdate(cleanupPlayers);
+			cleanUp.close();
+
+			final Statement vacuum = connection.createStatement();
+
+			vacuum.executeUpdate("VACUUM;");
+			vacuum.close();
+
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
 }

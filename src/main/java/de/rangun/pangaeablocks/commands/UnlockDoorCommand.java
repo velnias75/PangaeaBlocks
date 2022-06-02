@@ -17,18 +17,36 @@
  * along with PangaeaBlocks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.rangun.pangaeablocks.db;
+package de.rangun.pangaeablocks.commands;
+
+import org.bukkit.Particle;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Player;
+
+import de.rangun.pangaeablocks.db.DatabaseClient;
 
 /**
  * @author heiko
  *
  */
-public interface Database extends DatabaseClient {
+public final class UnlockDoorCommand extends AbstractDoorCommand {
 
-	void open();
+	public UnlockDoorCommand(final DatabaseClient db) {
+		super(db);
+	}
 
-	void close();
+	@Override
+	protected void doorAction(final Block block, final Player player) {
+		db.deleteBlock(block);
+	}
 
-	void vacuum();
+	@Override
+	protected Particle particle() {
+		return Particle.VILLAGER_ANGRY;
+	}
 
+	@Override
+	protected String status() {
+		return "unlocked from";
+	}
 }

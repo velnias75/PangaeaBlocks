@@ -9,4 +9,7 @@ commands:
     description: locks resp. protects a door/gate/trapdoor
     permission: pangaeablocks.lockdoor
     usage: /lockdoor
- 
+  unlockdoor:
+    description: unlocks resp. unprotects a door/gate/trapdoor
+    permission: pangaeablocks.lockdoor
+    usage: /unlockdoor

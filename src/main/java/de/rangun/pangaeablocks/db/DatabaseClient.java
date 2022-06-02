@@ -19,16 +19,21 @@
 
 package de.rangun.pangaeablocks.db;
 
+import java.util.Set;
+import java.util.UUID;
+
+import org.bukkit.block.Block;
+
 /**
  * @author heiko
  *
  */
-public interface Database extends DatabaseClient {
+public interface DatabaseClient {
 
-	void open();
+	Set<UUID> getBlockOwners(Block block);
 
-	void close();
+	void registerBlock(Block block, UUID uuid);
 
-	void vacuum();
+	void deleteBlock(Block block);
 
 }

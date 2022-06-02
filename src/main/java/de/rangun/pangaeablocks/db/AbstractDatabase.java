@@ -23,6 +23,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -41,7 +44,15 @@ abstract class AbstractDatabase implements Database {
 	protected final static String table = "blocks";
 
 	private final static String insertBlock = """
-			REPLACE INTO "blocks" (x, y, z, world, uuid) VALUES (?, ?, ?, ?, ?);
+			INSERT OR IGNORE INTO "blocks" (x, y, z, world) VALUES (?, ?, ?, ?);
+			""";
+
+	private final static String insertPlayer = """
+			INSERT OR IGNORE INTO "players" (uuid) VALUES (?);
+			""";
+
+	private final static String connectBlockPlayer = """
+			INSERT OR IGNORE INTO blocks_players (block_id, player_id) SELECT blocks.id, players.id FROM blocks, players WHERE world = ? AND x = ? AND y = ? AND z = ? AND uuid = ?;
 			""";
 
 	private final static String deleteBlock = """
@@ -49,7 +60,7 @@ abstract class AbstractDatabase implements Database {
 			""";
 
 	private final static String getBlock = """
-			SELECT "uuid" FROM "blocks" WHERE "x" = ? AND "y" = ? AND "z" = ? AND "world" = ?;
+			SELECT players.uuid, blocks.id FROM blocks LEFT JOIN blocks_players ON blocks_players.block_id = blocks.id LEFT JOIN players ON blocks_players.player_id = players.id WHERE world = ? AND x = ? AND y = ? AND z = ?;
 			""";
 
 	protected AbstractDatabase(Plugin instance) {
@@ -59,7 +70,7 @@ abstract class AbstractDatabase implements Database {
 	protected abstract Connection getSQLConnection();
 
 	@Override
-	public abstract void load();
+	public abstract void open();
 
 	protected final void initialize() {
 
@@ -78,23 +89,23 @@ abstract class AbstractDatabase implements Database {
 	}
 
 	@Override
-	public UUID getBlock(final Block block) {
+	public Set<UUID> getBlockOwners(final Block block) {
 
-		String uuid = null;
+		final Set<UUID> uuids = new HashSet<>();
 
 		try {
 
 			final PreparedStatement ps = connection.prepareStatement(getBlock);
 
-			ps.setInt(1, block.getX());
-			ps.setInt(2, block.getY());
-			ps.setInt(3, block.getZ());
-			ps.setString(4, block.getWorld().getName());
+			ps.setString(1, block.getWorld().getName());
+			ps.setInt(2, block.getX());
+			ps.setInt(3, block.getY());
+			ps.setInt(4, block.getZ());
 
 			final ResultSet rs = ps.executeQuery();
 
-			if (rs.next()) {
-				uuid = new String(rs.getString(1));
+			while (rs.next()) {
+				uuids.add(UUID.fromString(rs.getString(1)));
 			}
 
 			close(ps, rs);
@@ -103,29 +114,60 @@ abstract class AbstractDatabase implements Database {
 			e.printStackTrace();
 		}
 
-		return uuid == null ? null : UUID.fromString(uuid);
+		return Collections.unmodifiableSet(uuids);
 	}
 
 	@Override
 	public void registerBlock(final Block block, final UUID uuid) {
 
-		try {
+		try (final PreparedStatement psBlock = connection.prepareStatement(insertBlock);
+				final PreparedStatement psPlayer = connection.prepareStatement(insertPlayer);
+				final PreparedStatement psConnect = connection.prepareStatement(connectBlockPlayer);) {
 
-			final PreparedStatement ps = connection.prepareStatement(insertBlock);
+			connection.setAutoCommit(false);
 
-			ps.setInt(1, block.getX());
-			ps.setInt(2, block.getY());
-			ps.setInt(3, block.getZ());
+			psBlock.setInt(1, block.getX());
+			psBlock.setInt(2, block.getY());
+			psBlock.setInt(3, block.getZ());
+			psBlock.setString(4, block.getWorld().getName());
+			psBlock.executeUpdate();
 
-			ps.setString(4, block.getWorld().getName());
-			ps.setString(5, uuid.toString());
+			psPlayer.setString(1, uuid.toString());
+			psPlayer.executeUpdate();
 
-			ps.executeUpdate();
+			psConnect.setString(1, block.getWorld().getName());
+			psConnect.setInt(2, block.getX());
+			psConnect.setInt(3, block.getY());
+			psConnect.setInt(4, block.getZ());
+			psConnect.setString(5, uuid.toString());
+			psConnect.executeUpdate();
 
-			close(ps, null);
+			connection.commit();
+
+			close(psBlock, null);
+			close(psPlayer, null);
+			close(psConnect, null);
 
 		} catch (SQLException e) {
+
 			e.printStackTrace();
+
+			if (connection != null) {
+
+				try {
+					connection.rollback();
+				} catch (SQLException e2) {
+					e2.printStackTrace();
+				}
+			}
+
+		} finally {
+
+			try {
+				connection.setAutoCommit(true);
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 

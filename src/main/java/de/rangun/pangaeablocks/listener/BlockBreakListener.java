@@ -19,6 +19,7 @@
 
 package de.rangun.pangaeablocks.listener;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.bukkit.block.Block;
@@ -27,7 +28,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 
-import de.rangun.pangaeablocks.db.Database;
+import de.rangun.pangaeablocks.db.DatabaseClient;
 import de.rangun.pangaeablocks.utils.Utils;
 
 /**
@@ -36,9 +37,9 @@ import de.rangun.pangaeablocks.utils.Utils;
  */
 public final class BlockBreakListener implements Listener {
 
-	private final Database db;
+	private final DatabaseClient db;
 
-	public BlockBreakListener(final Database db) {
+	public BlockBreakListener(final DatabaseClient db) {
 		this.db = db;
 	}
 
@@ -50,15 +51,12 @@ public final class BlockBreakListener implements Listener {
 		if (block.getBlockData() instanceof Openable) {
 
 			final Block locBlock = Utils.doorBottom(block);
-			final UUID uuid = db.getBlock(locBlock);
+			final Set<UUID> uuids = db.getBlockOwners(locBlock);
 
-			if (uuid != null) {
-
-				if (!uuid.equals(event.getPlayer().getUniqueId())) {
-					event.setCancelled(true);
-				} else {
-					db.deleteBlock(locBlock);
-				}
+			if (!uuids.isEmpty() && !uuids.contains(event.getPlayer().getUniqueId())) {
+				event.setCancelled(true);
+			} else {
+				db.deleteBlock(locBlock);
 			}
 		}
 	}
