@@ -16,4 +16,9 @@ commands:
   hologram:
     description: turns an armor stand into a hologram
     permission: pangaeablocks.hologram
-    usage: /hologram
+    usage: /hologram [text]
+  frame:
+    description: toggles frame attributes
+    permission: pangaeablocks.frame
+    usage: /frame (toggle_visibility|toggle_fixation)
+    
