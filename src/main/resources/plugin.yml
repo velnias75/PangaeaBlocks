@@ -13,3 +13,7 @@ commands:
     description: unlocks resp. unprotects a door/gate/trapdoor
     permission: pangaeablocks.lockdoor
     usage: /unlockdoor
+  hologram:
+    description: turns an armor stand into a hologram
+    permission: pangaeablocks.hologram
+    usage: /hologram

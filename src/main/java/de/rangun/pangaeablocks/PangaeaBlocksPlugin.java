@@ -21,6 +21,7 @@ package de.rangun.pangaeablocks;
 
 import org.bukkit.plugin.java.JavaPlugin;
 
+import de.rangun.pangaeablocks.commands.HologramCommand;
 import de.rangun.pangaeablocks.commands.LockDoorCommand;
 import de.rangun.pangaeablocks.commands.UnlockDoorCommand;
 import de.rangun.pangaeablocks.db.Database;
@@ -42,12 +43,15 @@ public final class PangaeaBlocksPlugin extends JavaPlugin {
 
 		final LockDoorCommand ld = new LockDoorCommand(db);
 		final UnlockDoorCommand uld = new UnlockDoorCommand(db);
+		final HologramCommand holo = new HologramCommand();
 
 		getCommand("lockdoor").setExecutor(ld);
 		getCommand("unlockdoor").setExecutor(uld);
+		getCommand("hologram").setExecutor(holo);
 
 		getCommand("lockdoor").setTabCompleter(ld);
 		getCommand("unlockdoor").setTabCompleter(uld);
+		getCommand("hologram").setTabCompleter(holo);
 
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new VehicleExitListener(this, db), this);

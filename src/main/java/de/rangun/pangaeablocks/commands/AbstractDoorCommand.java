@@ -40,7 +40,6 @@ abstract class AbstractDoorCommand extends NonDefaultTabCompleter implements Com
 	protected final DatabaseClient db;
 
 	protected AbstractDoorCommand(final DatabaseClient db) {
-		super();
 		this.db = db;
 	}
 
