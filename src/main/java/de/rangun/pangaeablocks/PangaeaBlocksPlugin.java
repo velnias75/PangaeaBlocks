@@ -40,8 +40,14 @@ public final class PangaeaBlocksPlugin extends JavaPlugin {
 		this.db = new SQLite(this);
 		this.db.open();
 
-		getCommand("lockdoor").setExecutor(new LockDoorCommand(db));
-		getCommand("unlockdoor").setExecutor(new UnlockDoorCommand(db));
+		final LockDoorCommand ld = new LockDoorCommand(db);
+		final UnlockDoorCommand uld = new UnlockDoorCommand(db);
+
+		getCommand("lockdoor").setExecutor(ld);
+		getCommand("unlockdoor").setExecutor(uld);
+
+		getCommand("lockdoor").setTabCompleter(ld);
+		getCommand("unlockdoor").setTabCompleter(uld);
 
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new VehicleExitListener(this, db), this);

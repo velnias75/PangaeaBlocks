@@ -19,6 +19,7 @@
 
 package de.rangun.pangaeablocks.commands;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Openable;
@@ -34,11 +35,12 @@ import de.rangun.pangaeablocks.utils.Utils;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 
-abstract class AbstractDoorCommand implements CommandExecutor {
+abstract class AbstractDoorCommand extends NonDefaultTabCompleter implements CommandExecutor {
 
 	protected final DatabaseClient db;
 
 	protected AbstractDoorCommand(final DatabaseClient db) {
+		super();
 		this.db = db;
 	}
 
@@ -49,7 +51,7 @@ abstract class AbstractDoorCommand implements CommandExecutor {
 	protected abstract Particle particle();
 
 	@Override
-	public boolean onCommand(final CommandSender sender, final Command command, final String label,
+	public final boolean onCommand(final CommandSender sender, final Command command, final String label,
 			final String[] args) {
 
 		if (sender instanceof Player) {
@@ -68,9 +70,13 @@ abstract class AbstractDoorCommand implements CommandExecutor {
 						.append(Component.translatable(block.getType())).append(Component.text(" at "))
 						.append(Component.text(block.getX())).append(Component.text(", "))
 						.append(Component.text(block.getY())).append(Component.text(", "))
-						.append(Component.text(block.getZ())).append(Component.text(" " + status() + " "))
-						.append(Component.text(player.getName())));
+						.append(Component.text(block.getZ())).append(Component.text(" ("))
+						.append(Component.text(block.getWorld().getKey().asString()))
+						.append(Component.text(") " + status() + " ")).append(Component.text(player.getName())));
 			}
+
+		} else {
+			Bukkit.getLogger().info("You must be an online player to execute this command.");
 		}
 
 		return true;
