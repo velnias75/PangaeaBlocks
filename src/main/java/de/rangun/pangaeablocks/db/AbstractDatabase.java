@@ -83,8 +83,8 @@ abstract class AbstractDatabase implements Database {
 
 			close(ps, rs);
 
-		} catch (SQLException ex) {
-			plugin.getLogger().log(Level.SEVERE, "Unable to retrieve connection", ex);
+		} catch (SQLException e) {
+			plugin.getLogger().log(Level.SEVERE, "Unable to retrieve connection", e);
 		}
 	}
 
@@ -111,7 +111,7 @@ abstract class AbstractDatabase implements Database {
 			close(ps, rs);
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Error.LogError(e);
 		}
 
 		return Collections.unmodifiableSet(uuids);
@@ -150,14 +150,14 @@ abstract class AbstractDatabase implements Database {
 
 		} catch (SQLException e) {
 
-			e.printStackTrace();
+			Error.LogError(e);
 
 			if (connection != null) {
 
 				try {
 					connection.rollback();
 				} catch (SQLException e2) {
-					e2.printStackTrace();
+					Error.LogError(e2);
 				}
 			}
 
@@ -166,7 +166,7 @@ abstract class AbstractDatabase implements Database {
 			try {
 				connection.setAutoCommit(true);
 			} catch (SQLException e) {
-				e.printStackTrace();
+				Error.LogError(e);
 			}
 		}
 	}
@@ -189,7 +189,7 @@ abstract class AbstractDatabase implements Database {
 			close(ps, null);
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Error.LogError(e);
 		}
 	}
 
@@ -203,8 +203,8 @@ abstract class AbstractDatabase implements Database {
 			if (rs != null)
 				rs.close();
 
-		} catch (SQLException ex) {
-			Error.close(plugin, ex);
+		} catch (SQLException e) {
+			Error.LogError(e);
 		}
 	}
 }

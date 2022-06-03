@@ -19,21 +19,18 @@
 
 package de.rangun.pangaeablocks.db;
 
+import java.sql.SQLException;
 import java.util.logging.Level;
 
-import org.bukkit.plugin.Plugin;
+import org.bukkit.Bukkit;
 
 /**
  * @author heiko
  *
  */
-final class Error {
+public final class Error {
 
-	public static void execute(Plugin plugin, Exception ex) {
-		plugin.getLogger().log(Level.SEVERE, "Couldn't execute MySQL statement: ", ex);
-	}
-
-	public static void close(Plugin plugin, Exception ex) {
-		plugin.getLogger().log(Level.SEVERE, "Failed to close MySQL connection: ", ex);
+	public static void LogError(final SQLException e) {
+		Bukkit.getLogger().log(Level.SEVERE, e.getMessage());
 	}
 }

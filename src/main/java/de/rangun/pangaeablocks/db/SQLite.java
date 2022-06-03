@@ -133,7 +133,7 @@ public final class SQLite extends AbstractDatabase {
 			s.close();
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Error.LogError(e);
 		}
 
 		initialize();
@@ -145,7 +145,7 @@ public final class SQLite extends AbstractDatabase {
 		try {
 			connection.close();
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Error.LogError(e);
 		}
 	}
 
@@ -165,7 +165,7 @@ public final class SQLite extends AbstractDatabase {
 			vacuum.close();
 
 		} catch (SQLException e) {
-			e.printStackTrace();
+			Error.LogError(e);
 		}
 	}
 }
