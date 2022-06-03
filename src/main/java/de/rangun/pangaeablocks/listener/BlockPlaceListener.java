@@ -35,10 +35,11 @@ public final class BlockPlaceListener extends ChairCandidateChecker implements L
 	@EventHandler
 	void onBlockPlaceEvent(final BlockPlaceEvent event) {
 
-		final Block block = event.getBlock();
+		final Block block = event.getBlockAgainst();
 		final ItemStack handItem = event.getItemInHand();
 
-		if (!event.getPlayer().isSneaking() && !Material.AIR.equals(handItem.getType()) && isValidForChair(block)) {
+		if (event.canBuild() && !event.getPlayer().isSneaking() && !Material.AIR.equals(handItem.getType())
+				&& isValidForChair(block)) {
 			event.setCancelled(true);
 		}
 	}

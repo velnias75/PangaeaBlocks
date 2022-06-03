@@ -19,6 +19,7 @@
 
 package de.rangun.pangaeablocks.listener;
 
+import org.bukkit.entity.Entity;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.plugin.Plugin;
@@ -39,6 +40,11 @@ public final class VehicleExitListener extends AbstractListener {
 	void onVehicleExitEvent(final VehicleExitEvent event) {
 
 		if (event.getVehicle().getPersistentDataContainer().has(pig)) {
+
+			for (Entity p : event.getVehicle().getPassengers()) {
+				p.teleport(p.getLocation().add(0.0f, 1.5f, 0.0f));
+			}
+
 			event.getVehicle().remove();
 			event.setCancelled(true);
 		}
