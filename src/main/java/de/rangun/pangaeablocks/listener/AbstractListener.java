@@ -19,43 +19,25 @@
 
 package de.rangun.pangaeablocks.listener;
 
-import java.util.Set;
-import java.util.UUID;
-
-import org.bukkit.block.Block;
-import org.bukkit.block.data.Openable;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.NamespacedKey;
+import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
 import de.rangun.pangaeablocks.db.DatabaseClient;
-import de.rangun.pangaeablocks.utils.Utils;
 
 /**
  * @author heiko
  *
  */
-public final class BlockBreakListener extends AbstractListener {
+abstract class AbstractListener extends ChairCandidateChecker implements Listener {
 
-	public BlockBreakListener(final Plugin plugin, final DatabaseClient db) {
-		super(plugin, db);
+	protected final NamespacedKey pig;
+	protected final DatabaseClient db;
+
+	protected AbstractListener(final Plugin plugin, final DatabaseClient db) {
+
+		this.db = db;
+		this.pig = new NamespacedKey(plugin, "zordans_pig");
 	}
 
-	@EventHandler
-	void onBlockBreakEvent(final BlockBreakEvent event) {
-
-		final Block block = event.getBlock();
-
-		if (block.getBlockData() instanceof Openable) {
-
-			final Block locBlock = Utils.doorBottom(block);
-			final Set<UUID> uuids = db.getBlockOwners(locBlock);
-
-			if (!uuids.isEmpty() && !uuids.contains(event.getPlayer().getUniqueId())) {
-				event.setCancelled(true);
-			} else {
-				db.deleteBlock(locBlock);
-			}
-		}
-	}
 }

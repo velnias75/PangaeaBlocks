@@ -22,18 +22,15 @@ package de.rangun.pangaeablocks.listener;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
+import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.Openable;
 import org.bukkit.block.data.type.Stairs;
-import org.bukkit.block.data.type.Stairs.Shape;
 import org.bukkit.entity.Pig;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.persistence.PersistentDataType;
@@ -47,14 +44,10 @@ import de.rangun.pangaeablocks.utils.Utils;
  * @author heiko
  *
  */
-public final class PlayerInteractListener implements Listener {
-
-	private final NamespacedKey pig;
-	private final DatabaseClient db;
+public final class PlayerInteractListener extends AbstractListener {
 
 	public PlayerInteractListener(final Plugin plugin, final DatabaseClient db) {
-		this.db = db;
-		this.pig = new NamespacedKey(plugin, "zordans_pig");
+		super(plugin, db);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -65,6 +58,7 @@ public final class PlayerInteractListener implements Listener {
 
 		final Block block = event.getClickedBlock();
 		final Action action = event.getAction();
+		final Player player = event.getPlayer();
 
 		if (block.getBlockData() instanceof Openable && action.isRightClick()) {
 
@@ -74,39 +68,28 @@ public final class PlayerInteractListener implements Listener {
 				event.setCancelled(true);
 			}
 
-		} else if (block.getBlockData() instanceof Stairs && action.isRightClick()
-				&& (isValidForChair((Stairs) block.getBlockData()) && (Material.REDSTONE_BLOCK.equals(
-						block.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ()).getType())))) {
+		} else if (action.isRightClick() && !player.isSneaking() && isValidForChair(block)) {
+
+			final Location l = player.getLocation();
+
+			l.setYaw(getChairYaw(block));
+			player.teleport(l);
 
 			block.getWorld().spawn(block.getLocation().add(0.5d, -0.5d, 0.5d), Pig.class, new Consumer<Pig>() {
 
 				@Override
-				public void accept(Pig d) {
+				public void accept(Pig p) {
 
-					d.setInvisible(true);
-					d.setSilent(true);
-					d.setInvulnerable(true);
-					d.setGravity(false);
-					d.addPassenger(event.getPlayer());
-					d.setAware(false);
-					d.setAI(false);
-					// d.setMaxHealth(0.0000000001d);
-					d.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(0.0000000001d);
-					d.getPersistentDataContainer().set(pig, PersistentDataType.BYTE, (byte) 1);
-
-					switch (((Stairs) block.getBlockData()).getFacing()) {
-					case SOUTH:
-						d.setRotation(180.0f, 0.0f);
-						break;
-					case NORTH:
-						d.setRotation(0.0f, 0.0f);
-						break;
-					case WEST:
-						d.setRotation(-90.0f, 0.0f);
-						break;
-					default:
-						d.setRotation(90.0f, 0.0f);
-					}
+					p.setInvisible(true);
+					p.setSilent(true);
+					p.setInvulnerable(true);
+					p.setGravity(false);
+					p.addPassenger(player);
+					p.setAware(false);
+					p.setAI(false);
+					p.setRotation(getChairYaw(block), 0.0f);
+					p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(0.0000000001d);
+					p.getPersistentDataContainer().set(pig, PersistentDataType.BYTE, (byte) 1);
 				}
 			});
 
@@ -114,7 +97,16 @@ public final class PlayerInteractListener implements Listener {
 		}
 	}
 
-	private boolean isValidForChair(Stairs block) {
-		return Shape.STRAIGHT.equals(block.getShape()) && Half.BOTTOM.equals(block.getHalf());
+	private float getChairYaw(final Block block) {
+		switch (((Stairs) block.getBlockData()).getFacing()) {
+		case SOUTH:
+			return 180.0f;
+		case NORTH:
+			return 0.0f;
+		case WEST:
+			return -90.0f;
+		default:
+			return 90.0f;
+		}
 	}
 }

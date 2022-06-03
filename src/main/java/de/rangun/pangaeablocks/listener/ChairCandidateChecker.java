@@ -19,43 +19,31 @@
 
 package de.rangun.pangaeablocks.listener;
 
-import java.util.Set;
-import java.util.UUID;
-
+import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Openable;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.plugin.Plugin;
-
-import de.rangun.pangaeablocks.db.DatabaseClient;
-import de.rangun.pangaeablocks.utils.Utils;
+import org.bukkit.block.data.Bisected.Half;
+import org.bukkit.block.data.type.Stairs;
+import org.bukkit.block.data.type.Stairs.Shape;
 
 /**
  * @author heiko
  *
  */
-public final class BlockBreakListener extends AbstractListener {
+class ChairCandidateChecker {
 
-	public BlockBreakListener(final Plugin plugin, final DatabaseClient db) {
-		super(plugin, db);
+	protected ChairCandidateChecker() {
 	}
 
-	@EventHandler
-	void onBlockBreakEvent(final BlockBreakEvent event) {
+	protected final boolean isValidForChair(Block block) {
 
-		final Block block = event.getBlock();
-
-		if (block.getBlockData() instanceof Openable) {
-
-			final Block locBlock = Utils.doorBottom(block);
-			final Set<UUID> uuids = db.getBlockOwners(locBlock);
-
-			if (!uuids.isEmpty() && !uuids.contains(event.getPlayer().getUniqueId())) {
-				event.setCancelled(true);
-			} else {
-				db.deleteBlock(locBlock);
-			}
+		if (!(block.getBlockData() instanceof Stairs)) {
+			return false;
 		}
+
+		final Stairs stair = (Stairs) block.getBlockData();
+
+		return Shape.STRAIGHT.equals(stair.getShape()) && Half.BOTTOM.equals(stair.getHalf())
+				&& (Material.REDSTONE_BLOCK
+						.equals(block.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ()).getType()));
 	}
 }

@@ -19,26 +19,24 @@
 
 package de.rangun.pangaeablocks.listener;
 
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
 import org.bukkit.event.vehicle.VehicleExitEvent;
 import org.bukkit.plugin.Plugin;
+
+import de.rangun.pangaeablocks.db.DatabaseClient;
 
 /**
  * @author heiko
  *
  */
-public final class VehicleExitListener implements Listener {
+public final class VehicleExitListener extends AbstractListener {
 
-	private final NamespacedKey pig;
-
-	public VehicleExitListener(final Plugin plugin) {
-		this.pig = new NamespacedKey(plugin, "zordans_pig");
+	public VehicleExitListener(final Plugin plugin, final DatabaseClient db) {
+		super(plugin, db);
 	}
 
 	@EventHandler
-	void onVehicleExit(final VehicleExitEvent event) {
+	void onVehicleExitEvent(final VehicleExitEvent event) {
 
 		if (event.getVehicle().getPersistentDataContainer().has(pig)) {
 			event.getVehicle().remove();

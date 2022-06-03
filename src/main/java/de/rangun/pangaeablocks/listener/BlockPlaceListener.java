@@ -19,43 +19,27 @@
 
 package de.rangun.pangaeablocks.listener;
 
-import java.util.Set;
-import java.util.UUID;
-
+import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.data.Openable;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.plugin.Plugin;
-
-import de.rangun.pangaeablocks.db.DatabaseClient;
-import de.rangun.pangaeablocks.utils.Utils;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * @author heiko
  *
  */
-public final class BlockBreakListener extends AbstractListener {
-
-	public BlockBreakListener(final Plugin plugin, final DatabaseClient db) {
-		super(plugin, db);
-	}
+public final class BlockPlaceListener extends ChairCandidateChecker implements Listener {
 
 	@EventHandler
-	void onBlockBreakEvent(final BlockBreakEvent event) {
+	void onBlockPlaceEvent(final BlockPlaceEvent event) {
 
 		final Block block = event.getBlock();
+		final ItemStack handItem = event.getItemInHand();
 
-		if (block.getBlockData() instanceof Openable) {
-
-			final Block locBlock = Utils.doorBottom(block);
-			final Set<UUID> uuids = db.getBlockOwners(locBlock);
-
-			if (!uuids.isEmpty() && !uuids.contains(event.getPlayer().getUniqueId())) {
-				event.setCancelled(true);
-			} else {
-				db.deleteBlock(locBlock);
-			}
+		if (!event.getPlayer().isSneaking() && !Material.AIR.equals(handItem.getType()) && isValidForChair(block)) {
+			event.setCancelled(true);
 		}
 	}
 }
