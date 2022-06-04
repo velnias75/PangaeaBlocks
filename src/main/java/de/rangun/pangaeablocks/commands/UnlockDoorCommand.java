@@ -36,7 +36,7 @@ public final class UnlockDoorCommand extends AbstractDoorCommand {
 	}
 
 	@Override
-	protected void doorAction(final Block block, final Player player) {
+	protected void doorAction(final Block block, final Player player, final String[] args) {
 		db.deleteBlock(block);
 	}
 

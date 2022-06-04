@@ -21,7 +21,9 @@ package de.rangun.pangaeablocks.listener;
 
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
+import org.bukkit.block.data.Lightable;
 import org.bukkit.block.data.type.Stairs;
 import org.bukkit.block.data.type.Stairs.Shape;
 
@@ -34,7 +36,7 @@ class ChairCandidateChecker {
 	protected ChairCandidateChecker() {
 	}
 
-	protected final boolean isValidForChair(Block block) {
+	protected final boolean isValidForChair(final Block block) {
 
 		if (!(block.getBlockData() instanceof Stairs)) {
 			return false;
@@ -43,7 +45,18 @@ class ChairCandidateChecker {
 		final Stairs stair = (Stairs) block.getBlockData();
 
 		return Shape.STRAIGHT.equals(stair.getShape()) && Half.BOTTOM.equals(stair.getHalf())
-				&& (Material.REDSTONE_BLOCK
-						.equals(block.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ()).getType()));
+				&& ((block.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ())
+						.getBlockPower(BlockFace.UP) > 0
+						|| isActiveTorch(block.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ())))
+						&& isEmptyOrLiquid(block.getWorld().getBlockAt(block.getX(), block.getY() + 1, block.getZ()))
+						&& isEmptyOrLiquid(block.getWorld().getBlockAt(block.getX(), block.getY() + 2, block.getZ())));
+	}
+
+	private boolean isEmptyOrLiquid(final Block block) {
+		return block.isEmpty() || block.isLiquid();
+	}
+
+	private boolean isActiveTorch(final Block block) {
+		return Material.REDSTONE_TORCH.equals(block.getType()) && ((Lightable) block.getBlockData()).isLit();
 	}
 }

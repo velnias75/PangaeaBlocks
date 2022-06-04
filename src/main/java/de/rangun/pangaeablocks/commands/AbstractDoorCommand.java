@@ -37,13 +37,15 @@ import net.kyori.adventure.text.format.NamedTextColor;
 
 abstract class AbstractDoorCommand extends NonDefaultTabCompleter implements CommandExecutor {
 
+	protected final static String EVERYBODY = "everybody";
+
 	protected final DatabaseClient db;
 
 	protected AbstractDoorCommand(final DatabaseClient db) {
 		this.db = db;
 	}
 
-	protected abstract void doorAction(final Block block, final Player player);
+	protected abstract void doorAction(final Block block, final Player player, final String[] args);
 
 	protected abstract String status();
 
@@ -60,7 +62,7 @@ abstract class AbstractDoorCommand extends NonDefaultTabCompleter implements Com
 
 			if (block != null && block.getBlockData() instanceof Openable) {
 
-				doorAction(block, player);
+				doorAction(block, player, args);
 
 				(new ParticleBuilder(particle())).allPlayers().count(1).offset(0.0d, 0.0d, 0.0d)
 						.location(Utils.doorTop(block).getLocation().add(0.5d, 1.25d, 0.5d)).spawn();
@@ -71,7 +73,8 @@ abstract class AbstractDoorCommand extends NonDefaultTabCompleter implements Com
 						.append(Component.text(block.getY())).append(Component.text(", "))
 						.append(Component.text(block.getZ())).append(Component.text(" ("))
 						.append(Component.text(block.getWorld().getKey().asString()))
-						.append(Component.text(") " + status() + " ")).append(Component.text(player.getName())));
+						.append(Component.text(") " + status() + " ")).append(Component.text(
+								!EVERYBODY.equals(args.length > 0 ? args[0] : null) ? player.getName() : EVERYBODY)));
 			}
 
 		} else {

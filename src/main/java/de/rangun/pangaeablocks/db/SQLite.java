@@ -55,7 +55,7 @@ public final class SQLite extends AbstractDatabase {
 			);
 			CREATE TABLE IF NOT EXISTS "players" (
 				"id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-				"uuid" VARCHAR NOT NULL,
+				"uuid" TEXT(36) NOT NULL,
 				UNIQUE("uuid")
 			);
 			CREATE TABLE IF NOT EXISTS "blocks_players" (

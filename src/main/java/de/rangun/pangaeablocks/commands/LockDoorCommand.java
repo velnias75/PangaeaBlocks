@@ -19,9 +19,16 @@
 
 package de.rangun.pangaeablocks.commands;
 
+import java.util.List;
+import java.util.UUID;
+
 import org.bukkit.Particle;
 import org.bukkit.block.Block;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+
+import com.google.common.collect.ImmutableList;
 
 import de.rangun.pangaeablocks.db.DatabaseClient;
 import de.rangun.pangaeablocks.utils.Utils;
@@ -37,8 +44,10 @@ public final class LockDoorCommand extends AbstractDoorCommand {
 	}
 
 	@Override
-	protected void doorAction(final Block block, final Player player) {
-		db.registerBlock(Utils.doorBottom(block), player.getUniqueId());
+	protected void doorAction(final Block block, final Player player, final String[] args) {
+		db.registerBlock(Utils.doorBottom(block),
+				args.length == 0 || !EVERYBODY.equals(args.length > 0 ? args[0] : null) ? player.getUniqueId()
+						: UUID.fromString("00000000-0000-0000-0000-000000000000"));
 	}
 
 	@Override
@@ -49,5 +58,15 @@ public final class LockDoorCommand extends AbstractDoorCommand {
 	@Override
 	protected String status() {
 		return "locked to";
+	}
+
+	@Override
+	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+
+		if (args.length > 0 && args.length < 2) {
+			return ImmutableList.of(EVERYBODY);
+		}
+
+		return super.onTabComplete(sender, command, label, args);
 	}
 }
