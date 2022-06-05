@@ -32,10 +32,10 @@ import de.rangun.pangaeablocks.db.DatabaseClient;
 abstract class AbstractListener extends ChairCandidateChecker implements Listener {
 
 	protected final NamespacedKey pig;
-	protected final DatabaseClient db;
+	protected final DatabaseClient db; // NOPMD by heiko on 05.06.22, 01:03
 
-	protected AbstractListener(final Plugin plugin, final DatabaseClient db) {
-
+	protected AbstractListener(final Plugin plugin, final DatabaseClient db) { // NOPMD by heiko on 05.06.22, 01:03
+		super();
 		this.db = db;
 		this.pig = new NamespacedKey(plugin, "zordans_pig");
 	}

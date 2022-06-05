@@ -30,7 +30,10 @@ import org.bukkit.Bukkit;
  */
 public final class Error {
 
-	public static void LogError(final SQLException e) {
+	private Error() {
+	}
+
+	public static void logError(final SQLException e) { // NOPMD by heiko on 05.06.22, 01:24
 		Bukkit.getLogger().log(Level.SEVERE, e.getMessage());
 	}
 }

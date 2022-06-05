@@ -39,14 +39,19 @@ import de.rangun.pangaeablocks.utils.Utils;
  */
 public final class LockDoorCommand extends AbstractDoorCommand {
 
-	public LockDoorCommand(DatabaseClient db) {
+	public LockDoorCommand(final DatabaseClient db) { // NOPMD by heiko on 05.06.22, 01:31
 		super(db);
 	}
 
 	@Override
 	protected void doorAction(final Block block, final Player player, final String[] args) {
 		db.registerBlock(Utils.doorBottom(block),
-				args.length == 0 || !EVERYBODY.equals(args.length > 0 ? args[0] : null) ? player.getUniqueId()
+				args.length == 0 || !EVERYBODY.equals(args.length > 0 ? args[0] : null) ? player.getUniqueId() // NOPMD
+																												// by
+																												// heiko
+																												// on
+																												// 05.06.22,
+																												// 01:31
 						: UUID.fromString("00000000-0000-0000-0000-000000000000"));
 	}
 
@@ -61,10 +66,11 @@ public final class LockDoorCommand extends AbstractDoorCommand {
 	}
 
 	@Override
-	public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
+	public List<String> onTabComplete(final CommandSender sender, final Command command, final String label,
+			final String[] args) {
 
 		if (args.length > 0 && args.length < 2) {
-			return ImmutableList.of(EVERYBODY);
+			return ImmutableList.of(EVERYBODY); // NOPMD by heiko on 05.06.22, 01:31
 		}
 
 		return super.onTabComplete(sender, command, label, args);

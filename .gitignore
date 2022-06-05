@@ -2,6 +2,7 @@
 .classpath
 .project
 .settings/
+.pmd
 
 # Ignore Gradle project-specific cache directory
 .gradle

@@ -30,10 +30,11 @@ import org.bukkit.inventory.ItemStack;
  * @author heiko
  *
  */
-public final class BlockPlaceListener extends ChairCandidateChecker implements Listener {
+public final class BlockPlaceListener extends ChairCandidateChecker implements Listener { // NOPMD by heiko on 05.06.22,
+																							// 01:07
 
 	@EventHandler
-	void onBlockPlaceEvent(final BlockPlaceEvent event) {
+	public void onBlockPlaceEvent(final BlockPlaceEvent event) {
 
 		final Block block = event.getBlockAgainst();
 		final ItemStack handItem = event.getItemInHand();

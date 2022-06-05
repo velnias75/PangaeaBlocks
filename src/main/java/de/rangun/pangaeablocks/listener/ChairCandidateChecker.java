@@ -33,19 +33,20 @@ import org.bukkit.block.data.type.Stairs.Shape;
  */
 class ChairCandidateChecker {
 
-	protected ChairCandidateChecker() {
+	protected ChairCandidateChecker() { // NOPMD by heiko on 05.06.22, 06:59
 	}
 
 	protected final boolean isValidForChair(final Block block) {
 
 		if (!(block.getBlockData() instanceof Stairs)) {
-			return false;
+			return false; // NOPMD by heiko on 05.06.22, 06:58
 		}
 
 		final Stairs stair = (Stairs) block.getBlockData();
 
 		return Shape.STRAIGHT.equals(stair.getShape()) && Half.BOTTOM.equals(stair.getHalf())
-				&& ((block.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ())
+				&& ((block.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ()) // NOPMD by heiko on
+																								// 05.06.22, 06:58
 						.getBlockPower(BlockFace.UP) > 0
 						|| isActiveTorch(block.getWorld().getBlockAt(block.getX(), block.getY() - 1, block.getZ())))
 						&& isEmptyOrLiquid(block.getWorld().getBlockAt(block.getX(), block.getY() + 1, block.getZ()))

@@ -39,13 +39,14 @@ abstract class AbstractDoorCommand extends NonDefaultTabCompleter implements Com
 
 	protected final static String EVERYBODY = "everybody";
 
-	protected final DatabaseClient db;
+	protected final DatabaseClient db; // NOPMD by heiko on 05.06.22, 00:53
 
-	protected AbstractDoorCommand(final DatabaseClient db) {
+	protected AbstractDoorCommand(final DatabaseClient db) { // NOPMD by heiko on 05.06.22, 00:54
+		super();
 		this.db = db;
 	}
 
-	protected abstract void doorAction(final Block block, final Player player, final String[] args);
+	protected abstract void doorAction(Block block, Player player, String[] args); // NOPMD by heiko on 05.06.22, 00:40
 
 	protected abstract String status();
 
@@ -67,14 +68,21 @@ abstract class AbstractDoorCommand extends NonDefaultTabCompleter implements Com
 				(new ParticleBuilder(particle())).allPlayers().count(1).offset(0.0d, 0.0d, 0.0d)
 						.location(Utils.doorTop(block).getLocation().add(0.5d, 1.25d, 0.5d)).spawn();
 
-				player.sendMessage(Component.text().color(NamedTextColor.DARK_GREEN)
+				player.sendMessage(Component.text().color(NamedTextColor.DARK_GREEN) // NOPMD by heiko on 05.06.22,
+																						// 00:54
 						.append(Component.translatable(block.getType())).append(Component.text(" at "))
-						.append(Component.text(block.getX())).append(Component.text(", "))
+						.append(Component.text(block.getX())).append(Component.text(", ")) // NOPMD by heiko on
+																							// 05.06.22, 00:54
 						.append(Component.text(block.getY())).append(Component.text(", "))
 						.append(Component.text(block.getZ())).append(Component.text(" ("))
 						.append(Component.text(block.getWorld().getKey().asString()))
 						.append(Component.text(") " + status() + " ")).append(Component.text(
-								!EVERYBODY.equals(args.length > 0 ? args[0] : null) ? player.getName() : EVERYBODY)));
+								EVERYBODY.equals(args.length > 0 ? args[0] : null) ? EVERYBODY : player.getName()))); // NOPMD
+																														// by
+																														// heiko
+																														// on
+																														// 05.06.22,
+																														// 00:57
 			}
 
 		} else {

@@ -32,16 +32,16 @@ import de.rangun.pangaeablocks.db.DatabaseClient;
  */
 public final class VehicleExitListener extends AbstractListener {
 
-	public VehicleExitListener(final Plugin plugin, final DatabaseClient db) {
+	public VehicleExitListener(final Plugin plugin, final DatabaseClient db) { // NOPMD by heiko on 05.06.22, 01:08
 		super(plugin, db);
 	}
 
 	@EventHandler
-	void onVehicleExitEvent(final VehicleExitEvent event) {
+	public void onVehicleExitEvent(final VehicleExitEvent event) {
 
 		if (event.getVehicle().getPersistentDataContainer().has(pig)) {
 
-			for (Entity p : event.getVehicle().getPassengers()) {
+			for (final Entity p : event.getVehicle().getPassengers()) {
 				p.teleport(p.getLocation().add(0.0f, 1.5f, 0.0f));
 			}
 

@@ -32,9 +32,9 @@ import de.rangun.pangaeablocks.listener.BlockPlaceListener;
 import de.rangun.pangaeablocks.listener.PlayerInteractListener;
 import de.rangun.pangaeablocks.listener.VehicleExitListener;
 
-public final class PangaeaBlocksPlugin extends JavaPlugin {
+public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on 05.06.22, 00:46
 
-	private Database db;
+	private Database db; // NOPMD by heiko on 05.06.22, 00:50
 
 	@Override
 	public void onEnable() {
@@ -42,20 +42,20 @@ public final class PangaeaBlocksPlugin extends JavaPlugin {
 		this.db = new SQLite(this);
 		this.db.open();
 
-		final LockDoorCommand ld = new LockDoorCommand(db);
-		final UnlockDoorCommand uld = new UnlockDoorCommand(db);
+		final LockDoorCommand lockdoor = new LockDoorCommand(db);
+		final UnlockDoorCommand unlockdoor = new UnlockDoorCommand(db);
 		final HologramCommand holo = new HologramCommand();
 		final FrameCommand frame = new FrameCommand();
 
-		getCommand("lockdoor").setExecutor(ld);
-		getCommand("unlockdoor").setExecutor(uld);
-		getCommand("hologram").setExecutor(holo);
-		getCommand("frame").setExecutor(frame);
+		getCommand("lockdoor").setExecutor(lockdoor); // NOPMD by heiko on 05.06.22, 00:52
+		getCommand("unlockdoor").setExecutor(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
+		getCommand("hologram").setExecutor(holo); // NOPMD by heiko on 05.06.22, 00:52
+		getCommand("frame").setExecutor(frame); // NOPMD by heiko on 05.06.22, 00:52
 
-		getCommand("lockdoor").setTabCompleter(ld);
-		getCommand("unlockdoor").setTabCompleter(uld);
-		getCommand("hologram").setTabCompleter(holo);
-		getCommand("frame").setTabCompleter(frame);
+		getCommand("lockdoor").setTabCompleter(lockdoor); // NOPMD by heiko on 05.06.22, 00:51
+		getCommand("unlockdoor").setTabCompleter(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
+		getCommand("hologram").setTabCompleter(holo); // NOPMD by heiko on 05.06.22, 00:51
+		getCommand("frame").setTabCompleter(frame); // NOPMD by heiko on 05.06.22, 00:51
 
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new VehicleExitListener(this, db), this);

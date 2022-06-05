@@ -37,12 +37,12 @@ import de.rangun.pangaeablocks.utils.Utils;
  */
 public final class BlockBreakListener extends AbstractListener {
 
-	public BlockBreakListener(final Plugin plugin, final DatabaseClient db) {
+	public BlockBreakListener(final Plugin plugin, final DatabaseClient db) { // NOPMD by heiko on 05.06.22, 01:03
 		super(plugin, db);
 	}
 
 	@EventHandler
-	void onBlockBreakEvent(final BlockBreakEvent event) {
+	public void onBlockBreakEvent(final BlockBreakEvent event) {
 
 		final Block block = event.getBlock();
 
@@ -51,7 +51,8 @@ public final class BlockBreakListener extends AbstractListener {
 			final Block locBlock = Utils.doorBottom(block);
 			final Set<UUID> uuids = db.getBlockOwners(locBlock);
 
-			if (!uuids.isEmpty() && !uuids.contains(event.getPlayer().getUniqueId())) {
+			if (!uuids.isEmpty() && !uuids.contains(event.getPlayer().getUniqueId())) { // NOPMD by heiko on 05.06.22,
+																						// 01:06
 				event.setCancelled(true);
 			} else {
 				db.deleteBlock(locBlock);

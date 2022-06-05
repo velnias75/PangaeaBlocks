@@ -33,6 +33,7 @@ import org.bukkit.util.RayTraceResult;
 abstract class AbstractRaytraceCommand extends NonDefaultTabCompleter implements CommandExecutor {
 
 	protected AbstractRaytraceCommand() {
+		super();
 	}
 
 	@Override
@@ -42,10 +43,11 @@ abstract class AbstractRaytraceCommand extends NonDefaultTabCompleter implements
 		if (sender instanceof Player) {
 
 			final Player player = (Player) sender;
-			final RayTraceResult result = player.getWorld().rayTraceEntities(player.getLocation(),
+			final RayTraceResult result = player.getWorld().rayTraceEntities(player.getLocation(), // NOPMD by heiko on
+																									// 05.06.22, 00:43
 					player.getLocation().getDirection(), 8, 1.5d);
 
-			return processRayTraceResult(result, args);
+			return processRayTraceResult(result, args); // NOPMD by heiko on 05.06.22, 01:01
 
 		} else {
 			Bukkit.getLogger().info("You must be an online player to execute this command.");
@@ -54,6 +56,7 @@ abstract class AbstractRaytraceCommand extends NonDefaultTabCompleter implements
 		return true;
 	}
 
-	protected abstract boolean processRayTraceResult(final RayTraceResult result, final String[] args);
+	protected abstract boolean processRayTraceResult(RayTraceResult result, String[] args); // NOPMD by heiko on
+																							// 05.06.22, 00:40
 
 }

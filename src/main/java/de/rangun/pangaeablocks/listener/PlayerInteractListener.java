@@ -46,15 +46,16 @@ import de.rangun.pangaeablocks.utils.Utils;
  */
 public final class PlayerInteractListener extends AbstractListener {
 
-	public PlayerInteractListener(final Plugin plugin, final DatabaseClient db) {
+	public PlayerInteractListener(final Plugin plugin, final DatabaseClient db) { // NOPMD by heiko on 05.06.22, 01:14
 		super(plugin, db);
 	}
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-	void onPlayerInteractEvent(final PlayerInteractEvent event) {
+	public void onPlayerInteractEvent(final PlayerInteractEvent event) {
 
-		if (!event.hasBlock())
+		if (!event.hasBlock()) {
 			return;
+		}
 
 		final Block block = event.getClickedBlock();
 		final Action action = event.getAction();
@@ -70,26 +71,27 @@ public final class PlayerInteractListener extends AbstractListener {
 
 		} else if (action.isRightClick() && !player.isSneaking() && isValidForChair(block)) {
 
-			final Location l = player.getLocation();
+			final Location location = player.getLocation();
 
-			l.setYaw(getChairYaw(block));
-			player.teleport(l);
+			location.setYaw(getChairYaw(block));
+			player.teleport(location);
 
 			block.getWorld().spawn(block.getLocation().add(0.5d, -0.5d, 0.5d), Pig.class, new Consumer<Pig>() {
 
 				@Override
-				public void accept(Pig p) {
+				public void accept(final Pig vehicle) {
 
-					p.setInvisible(true);
-					p.setSilent(true);
-					p.setInvulnerable(true);
-					p.setGravity(false);
-					p.addPassenger(player);
-					p.setAware(false);
-					p.setAI(false);
-					p.setRotation(getChairYaw(block), 0.0f);
-					p.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(0.0000000001d);
-					p.getPersistentDataContainer().set(pig, PersistentDataType.BYTE, (byte) 1);
+					vehicle.setInvisible(true);
+					vehicle.setSilent(true);
+					vehicle.setInvulnerable(true);
+					vehicle.setGravity(false);
+					vehicle.addPassenger(player);
+					vehicle.setAware(false);
+					vehicle.setAI(false);
+					vehicle.setRotation(getChairYaw(block), 0.0f);
+					vehicle.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(0.0000000001d); // NOPMD by heiko on
+																									// 05.06.22, 01:10
+					vehicle.getPersistentDataContainer().set(pig, PersistentDataType.BYTE, (byte) 1);
 				}
 			});
 
@@ -100,11 +102,11 @@ public final class PlayerInteractListener extends AbstractListener {
 	private float getChairYaw(final Block block) {
 		switch (((Stairs) block.getBlockData()).getFacing()) {
 		case SOUTH:
-			return 180.0f;
+			return 180.0f; // NOPMD by heiko on 05.06.22, 01:17
 		case NORTH:
-			return 0.0f;
+			return 0.0f; // NOPMD by heiko on 05.06.22, 01:17
 		case WEST:
-			return -90.0f;
+			return -90.0f; // NOPMD by heiko on 05.06.22, 01:17
 		default:
 			return 90.0f;
 		}

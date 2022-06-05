@@ -30,30 +30,30 @@ import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
  * @author heiko
  *
  */
-public final class HologramCommand extends AbstractRaytraceCommand {
+public final class HologramCommand extends AbstractRaytraceCommand { // NOPMD by heiko on 05.06.22, 01:32
 
 	@Override
 	protected boolean processRayTraceResult(final RayTraceResult result, final String[] args) {
 
 		if (result != null && EntityType.ARMOR_STAND.equals(result.getHitEntity().getType())) {
 
-			final ArmorStand as = (ArmorStand) result.getHitEntity();
+			final ArmorStand armorStand = (ArmorStand) result.getHitEntity();
 
-			if (!(args.length == 0 && as.isInvisible())) {
+			if (!(args.length == 0 && armorStand.isInvisible())) { // NOPMD by heiko on 05.06.22, 01:32
 
-				as.customName(LegacyComponentSerializer.legacyAmpersand().deserialize(String.join(" ", args)));
-				as.setCustomNameVisible(true);
-				as.setInvulnerable(true);
-				as.setInvisible(true);
-				as.setGravity(false);
+				armorStand.customName(LegacyComponentSerializer.legacyAmpersand().deserialize(String.join(" ", args)));
+				armorStand.setCustomNameVisible(true);
+				armorStand.setInvulnerable(true);
+				armorStand.setInvisible(true);
+				armorStand.setGravity(false);
 
-				for (EquipmentSlot es : EquipmentSlot.values()) {
-					as.setDisabledSlots(es);
+				for (final EquipmentSlot es : EquipmentSlot.values()) {
+					armorStand.setDisabledSlots(es);
 				}
 
 			} else {
-				as.setInvisible(false);
-				as.setInvulnerable(false);
+				armorStand.setInvisible(false);
+				armorStand.setInvulnerable(false);
 			}
 		}
 

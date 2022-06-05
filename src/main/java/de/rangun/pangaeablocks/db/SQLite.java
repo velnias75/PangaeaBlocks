@@ -37,13 +37,7 @@ public final class SQLite extends AbstractDatabase {
 
 	private final String dbname;
 
-	public SQLite(Plugin instance) {
-
-		super(instance);
-		this.dbname = plugin.getConfig().getString("SQLite.Filename", "block_registry");
-	}
-
-	private final static String createBlockTable = """
+	private final static String CREATEBLOCKTABLE = """
 			PRAGMA foreign_keys = ON;
 			CREATE TABLE IF NOT EXISTS "blocks" (
 				"id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
@@ -79,9 +73,15 @@ public final class SQLite extends AbstractDatabase {
 			);
 			""";
 
-	private final static String cleanupPlayers = """
+	private final static String CLEANUPPLAYERS = """
 			DELETE FROM players AS d WHERE EXISTS (SELECT * FROM players AS S LEFT JOIN blocks_players ON blocks_players.player_id = S.id WHERE player_id IS NULL AND D.id = S.id);
 			""";
+
+	public SQLite(final Plugin instance) {
+
+		super(instance);
+		this.dbname = plugin.getConfig().getString("SQLite.Filename", "block_registry");
+	}
 
 	@Override
 	protected Connection getSQLConnection() {
@@ -103,13 +103,13 @@ public final class SQLite extends AbstractDatabase {
 		try {
 
 			if (connection != null && !connection.isClosed()) {
-				return connection;
+				return connection; // NOPMD by heiko on 05.06.22, 01:27
 			}
 
 			Class.forName("org.sqlite.JDBC");
 			connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
 
-			return connection;
+			return connection; // NOPMD by heiko on 05.06.22, 01:27
 
 		} catch (SQLException ex) {
 			plugin.getLogger().log(Level.SEVERE, "SQLite exception on initialize", ex);
@@ -127,13 +127,13 @@ public final class SQLite extends AbstractDatabase {
 
 		try {
 
-			final Statement s = connection.createStatement();
+			final Statement stmt = connection.createStatement(); // NOPMD by heiko on 05.06.22, 01:29
 
-			s.executeUpdate(createBlockTable);
-			s.close();
+			stmt.executeUpdate(CREATEBLOCKTABLE);
+			stmt.close();
 
 		} catch (SQLException e) {
-			Error.LogError(e);
+			Error.logError(e);
 		}
 
 		initialize();
@@ -145,7 +145,7 @@ public final class SQLite extends AbstractDatabase {
 		try {
 			connection.close();
 		} catch (SQLException e) {
-			Error.LogError(e);
+			Error.logError(e);
 		}
 	}
 
@@ -154,18 +154,18 @@ public final class SQLite extends AbstractDatabase {
 
 		try {
 
-			final Statement cleanUp = connection.createStatement();
+			final Statement cleanUp = connection.createStatement(); // NOPMD by heiko on 05.06.22, 01:29
 
-			cleanUp.executeUpdate(cleanupPlayers);
+			cleanUp.executeUpdate(CLEANUPPLAYERS);
 			cleanUp.close();
 
-			final Statement vacuum = connection.createStatement();
+			final Statement vacuum = connection.createStatement(); // NOPMD by heiko on 05.06.22, 01:29
 
 			vacuum.executeUpdate("VACUUM;");
 			vacuum.close();
 
 		} catch (SQLException e) {
-			Error.LogError(e);
+			Error.logError(e);
 		}
 	}
 }

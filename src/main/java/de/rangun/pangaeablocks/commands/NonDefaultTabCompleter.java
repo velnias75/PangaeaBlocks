@@ -32,6 +32,9 @@ import org.bukkit.command.TabCompleter;
  */
 class NonDefaultTabCompleter implements TabCompleter {
 
+	protected NonDefaultTabCompleter() { // NOPMD by heiko on 05.06.22, 01:02
+	}
+
 	@Override
 	public List<String> onTabComplete(final CommandSender sender, final Command command, final String label,
 			final String[] args) {

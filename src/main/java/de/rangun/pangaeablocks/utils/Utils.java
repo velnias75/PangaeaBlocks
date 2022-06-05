@@ -30,6 +30,9 @@ import org.bukkit.block.data.type.Door;
  */
 public final class Utils {
 
+	private Utils() {
+	}
+
 	public static Block doorBottom(final Block block) {
 
 		return block.getBlockData() instanceof Door && Half.TOP.equals(((Door) block.getBlockData()).getHalf())

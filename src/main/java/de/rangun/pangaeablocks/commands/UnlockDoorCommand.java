@@ -31,7 +31,7 @@ import de.rangun.pangaeablocks.db.DatabaseClient;
  */
 public final class UnlockDoorCommand extends AbstractDoorCommand {
 
-	public UnlockDoorCommand(final DatabaseClient db) {
+	public UnlockDoorCommand(final DatabaseClient db) { // NOPMD by heiko on 05.06.22, 01:30
 		super(db);
 	}
 

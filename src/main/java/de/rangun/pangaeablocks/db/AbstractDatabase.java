@@ -41,29 +41,29 @@ abstract class AbstractDatabase implements Database {
 	protected final Plugin plugin;
 	protected Connection connection;
 
-	protected final static String table = "blocks";
+	protected final static String TABLE = "blocks";
 
-	private final static String insertBlock = """
+	private final static String SQL_INSERTBLOCK = """
 			INSERT OR IGNORE INTO "blocks" (x, y, z, world) VALUES (?, ?, ?, ?);
 			""";
 
-	private final static String insertPlayer = """
+	private final static String SQL_INSERTPLAYER = """
 			INSERT OR IGNORE INTO "players" (uuid) VALUES (?);
 			""";
 
-	private final static String connectBlockPlayer = """
+	private final static String SQL_BLOCKPLAYER = """
 			INSERT OR IGNORE INTO blocks_players (block_id, player_id) SELECT blocks.id, players.id FROM blocks, players WHERE world = ? AND x = ? AND y = ? AND z = ? AND uuid = ?;
 			""";
 
-	private final static String deleteBlock = """
+	private final static String SQL_DELETEBLOCK = """
 			DELETE FROM "blocks" WHERE "x" = ? AND "y" = ? AND "z" = ? AND "world" = ?;
 			""";
 
-	private final static String getBlock = """
+	private final static String SQL_GETBLOCK = """
 			SELECT players.uuid, blocks.id FROM blocks LEFT JOIN blocks_players ON blocks_players.block_id = blocks.id LEFT JOIN players ON blocks_players.player_id = players.id WHERE world = ? AND x = ? AND y = ? AND z = ?;
 			""";
 
-	protected AbstractDatabase(Plugin instance) {
+	protected AbstractDatabase(final Plugin instance) {
 		this.plugin = instance;
 	}
 
@@ -78,8 +78,13 @@ abstract class AbstractDatabase implements Database {
 
 		try {
 
-			final PreparedStatement ps = connection.prepareStatement("SELECT * FROM " + table + " WHERE id = ?");
-			final ResultSet rs = ps.executeQuery();
+			final PreparedStatement ps = connection.prepareStatement("SELECT * FROM " + TABLE + " WHERE id = ?"); // NOPMD
+																													// by
+																													// heiko
+																													// on
+																													// 05.06.22,
+																													// 01:19
+			final ResultSet rs = ps.executeQuery(); // NOPMD by heiko on 05.06.22, 01:19
 
 			close(ps, rs);
 
@@ -95,14 +100,14 @@ abstract class AbstractDatabase implements Database {
 
 		try {
 
-			final PreparedStatement ps = connection.prepareStatement(getBlock);
+			final PreparedStatement ps = connection.prepareStatement(SQL_GETBLOCK); // NOPMD by heiko on 05.06.22, 01:19
 
 			ps.setString(1, block.getWorld().getName());
 			ps.setInt(2, block.getX());
 			ps.setInt(3, block.getY());
 			ps.setInt(4, block.getZ());
 
-			final ResultSet rs = ps.executeQuery();
+			final ResultSet rs = ps.executeQuery(); // NOPMD by heiko on 05.06.22, 01:19
 
 			while (rs.next()) {
 				uuids.add(UUID.fromString(rs.getString(1)));
@@ -111,7 +116,7 @@ abstract class AbstractDatabase implements Database {
 			close(ps, rs);
 
 		} catch (SQLException e) {
-			Error.LogError(e);
+			Error.logError(e);
 		}
 
 		return Collections.unmodifiableSet(uuids);
@@ -120,9 +125,9 @@ abstract class AbstractDatabase implements Database {
 	@Override
 	public void registerBlock(final Block block, final UUID uuid) {
 
-		try (final PreparedStatement psBlock = connection.prepareStatement(insertBlock);
-				final PreparedStatement psPlayer = connection.prepareStatement(insertPlayer);
-				final PreparedStatement psConnect = connection.prepareStatement(connectBlockPlayer);) {
+		try (PreparedStatement psBlock = connection.prepareStatement(SQL_INSERTBLOCK);
+				PreparedStatement psPlayer = connection.prepareStatement(SQL_INSERTPLAYER);
+				PreparedStatement psConnect = connection.prepareStatement(SQL_BLOCKPLAYER);) {
 
 			connection.setAutoCommit(false);
 
@@ -150,14 +155,14 @@ abstract class AbstractDatabase implements Database {
 
 		} catch (SQLException e) {
 
-			Error.LogError(e);
+			Error.logError(e);
 
 			if (connection != null) {
 
 				try {
 					connection.rollback();
 				} catch (SQLException e2) {
-					Error.LogError(e2);
+					Error.logError(e2);
 				}
 			}
 
@@ -166,17 +171,18 @@ abstract class AbstractDatabase implements Database {
 			try {
 				connection.setAutoCommit(true);
 			} catch (SQLException e) {
-				Error.LogError(e);
+				Error.logError(e);
 			}
 		}
 	}
 
 	@Override
-	public void deleteBlock(Block block) {
+	public void deleteBlock(final Block block) {
 
 		try {
 
-			final PreparedStatement ps = connection.prepareStatement(deleteBlock);
+			final PreparedStatement ps = connection.prepareStatement(SQL_DELETEBLOCK); // NOPMD by heiko on 05.06.22,
+																						// 01:19
 
 			ps.setInt(1, block.getX());
 			ps.setInt(2, block.getY());
@@ -189,22 +195,24 @@ abstract class AbstractDatabase implements Database {
 			close(ps, null);
 
 		} catch (SQLException e) {
-			Error.LogError(e);
+			Error.logError(e);
 		}
 	}
 
-	private void close(PreparedStatement ps, ResultSet rs) {
+	private void close(final PreparedStatement ps, final ResultSet rs) { // NOPMD by heiko on 05.06.22, 01:22
 
 		try {
 
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
+			}
 
-			if (rs != null)
+			if (rs != null) {
 				rs.close();
+			}
 
 		} catch (SQLException e) {
-			Error.LogError(e);
+			Error.logError(e);
 		}
 	}
 }

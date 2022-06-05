@@ -34,12 +34,12 @@ import com.google.common.collect.ImmutableList;
  * @author heiko
  *
  */
-public final class FrameCommand extends AbstractRaytraceCommand {
+public final class FrameCommand extends AbstractRaytraceCommand { // NOPMD by heiko on 05.06.22, 01:34
 
-	private final List<String> cmd_args = ImmutableList.of("toggle_visibility", "toggle_fixation");
+	private final List<String> cmdArgs = ImmutableList.of("toggle_visibility", "toggle_fixation");
 
 	@Override
-	protected boolean processRayTraceResult(RayTraceResult result, String[] args) {
+	protected boolean processRayTraceResult(final RayTraceResult result, final String[] args) {
 
 		if (result != null && result.getHitEntity() instanceof ItemFrame) {
 
@@ -47,40 +47,40 @@ public final class FrameCommand extends AbstractRaytraceCommand {
 
 			if (args.length > 0) {
 
-				if (cmd_args.get(0).equals(args[0])) {
+				if (cmdArgs.get(0).equals(args[0])) { // NOPMD by heiko on 05.06.22, 01:35
 					ifr.setVisible(!ifr.isVisible());
 				}
 
-				if (cmd_args.get(1).equals(args[0])) {
+				if (cmdArgs.get(1).equals(args[0])) { // NOPMD by heiko on 05.06.22, 01:35
 					ifr.setFixed(!ifr.isFixed());
 				}
 
-				return true;
+				return true; // NOPMD by heiko on 05.06.22, 01:35
 			}
 
-			return false;
+			return false; // NOPMD by heiko on 05.06.22, 01:35
 		}
 
 		return true;
 	}
 
 	@Override
-	public final List<String> onTabComplete(final CommandSender sender, final Command command, final String label,
+	public List<String> onTabComplete(final CommandSender sender, final Command command, final String label,
 			final String[] args) {
 
 		if (args.length > 0 && args.length < 2 && args[0].length() > 0) {
 
-			List<String> sugg = new ArrayList<>(cmd_args.size());
+			final List<String> sugg = new ArrayList<>(cmdArgs.size());
 
-			for (String string : cmd_args) {
+			for (final String string : cmdArgs) {
 				if (StringUtil.startsWithIgnoreCase(string, args[0])) {
 					sugg.add(string);
 				}
 			}
 
-			return ImmutableList.copyOf(sugg);
+			return ImmutableList.copyOf(sugg); // NOPMD by heiko on 05.06.22, 01:35
 		}
 
-		return args.length >= 2 ? super.onTabComplete(sender, command, label, args) : cmd_args;
+		return args.length >= 2 ? super.onTabComplete(sender, command, label, args) : cmdArgs;
 	}
 }
