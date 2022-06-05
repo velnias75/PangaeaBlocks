@@ -19,7 +19,6 @@
 
 package de.rangun.pangaeablocks.listener;
 
-import org.bukkit.NamespacedKey;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
@@ -29,15 +28,12 @@ import de.rangun.pangaeablocks.db.DatabaseClient;
  * @author heiko
  *
  */
-abstract class AbstractListener extends ChairCandidateChecker implements Listener {
+abstract class AbstractListener implements Listener {
 
-	protected final NamespacedKey pig;
 	protected final DatabaseClient db; // NOPMD by heiko on 05.06.22, 01:03
 
 	protected AbstractListener(final Plugin plugin, final DatabaseClient db) { // NOPMD by heiko on 05.06.22, 01:03
 		super();
 		this.db = db;
-		this.pig = new NamespacedKey(plugin, "zordans_pig");
 	}
-
 }

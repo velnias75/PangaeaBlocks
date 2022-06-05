@@ -28,9 +28,7 @@ import de.rangun.pangaeablocks.commands.UnlockDoorCommand;
 import de.rangun.pangaeablocks.db.Database;
 import de.rangun.pangaeablocks.db.SQLite;
 import de.rangun.pangaeablocks.listener.BlockBreakListener;
-import de.rangun.pangaeablocks.listener.BlockPlaceListener;
 import de.rangun.pangaeablocks.listener.PlayerInteractListener;
-import de.rangun.pangaeablocks.listener.VehicleExitListener;
 
 public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on 05.06.22, 00:46
 
@@ -58,9 +56,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getCommand("frame").setTabCompleter(frame); // NOPMD by heiko on 05.06.22, 00:51
 
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
-		getServer().getPluginManager().registerEvents(new VehicleExitListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(this, db), this);
-		getServer().getPluginManager().registerEvents(new BlockPlaceListener(), this);
 	}
 
 	@Override

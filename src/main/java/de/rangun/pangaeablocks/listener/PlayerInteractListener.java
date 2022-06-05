@@ -22,20 +22,13 @@ package de.rangun.pangaeablocks.listener;
 import java.util.Set;
 import java.util.UUID;
 
-import org.bukkit.Location;
-import org.bukkit.attribute.Attribute;
 import org.bukkit.block.Block;
 import org.bukkit.block.data.Openable;
-import org.bukkit.block.data.type.Stairs;
-import org.bukkit.entity.Pig;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.Consumer;
 
 import de.rangun.pangaeablocks.db.DatabaseClient;
 import de.rangun.pangaeablocks.utils.Utils;
@@ -59,7 +52,6 @@ public final class PlayerInteractListener extends AbstractListener {
 
 		final Block block = event.getClickedBlock();
 		final Action action = event.getAction();
-		final Player player = event.getPlayer();
 
 		if (block.getBlockData() instanceof Openable && action.isRightClick()) {
 
@@ -68,47 +60,6 @@ public final class PlayerInteractListener extends AbstractListener {
 			if (!uuids.isEmpty() && !uuids.contains(event.getPlayer().getUniqueId())) {
 				event.setCancelled(true);
 			}
-
-		} else if (action.isRightClick() && !player.isSneaking() && isValidForChair(block)) {
-
-			final Location location = player.getLocation();
-
-			location.setYaw(getChairYaw(block));
-			player.teleport(location);
-
-			block.getWorld().spawn(block.getLocation().add(0.5d, -0.5d, 0.5d), Pig.class, new Consumer<Pig>() {
-
-				@Override
-				public void accept(final Pig vehicle) {
-
-					vehicle.setInvisible(true);
-					vehicle.setSilent(true);
-					vehicle.setInvulnerable(true);
-					vehicle.setGravity(false);
-					vehicle.addPassenger(player);
-					vehicle.setAware(false);
-					vehicle.setAI(false);
-					vehicle.setRotation(getChairYaw(block), 0.0f);
-					vehicle.getAttribute(Attribute.GENERIC_MAX_HEALTH).setBaseValue(0.0000000001d); // NOPMD by heiko on
-																									// 05.06.22, 01:10
-					vehicle.getPersistentDataContainer().set(pig, PersistentDataType.BYTE, (byte) 1);
-				}
-			});
-
-			event.setCancelled(true);
-		}
-	}
-
-	private float getChairYaw(final Block block) {
-		switch (((Stairs) block.getBlockData()).getFacing()) {
-		case SOUTH:
-			return 180.0f; // NOPMD by heiko on 05.06.22, 01:17
-		case NORTH:
-			return 0.0f; // NOPMD by heiko on 05.06.22, 01:17
-		case WEST:
-			return -90.0f; // NOPMD by heiko on 05.06.22, 01:17
-		default:
-			return 90.0f;
 		}
 	}
 }
