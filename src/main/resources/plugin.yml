@@ -21,4 +21,8 @@ commands:
     description: toggles frame attributes
     permission: pangaeablocks.frame
     usage: /frame (toggle_visibility|toggle_fixation)
+  ticket:
+    description: tbw
+    permission: pangaeablocks.ticket
+    usage: /ticket
     

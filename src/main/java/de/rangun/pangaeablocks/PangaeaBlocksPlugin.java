@@ -24,11 +24,13 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.rangun.pangaeablocks.commands.FrameCommand;
 import de.rangun.pangaeablocks.commands.HologramCommand;
 import de.rangun.pangaeablocks.commands.LockDoorCommand;
+import de.rangun.pangaeablocks.commands.TicketCommand;
 import de.rangun.pangaeablocks.commands.UnlockDoorCommand;
 import de.rangun.pangaeablocks.db.Database;
 import de.rangun.pangaeablocks.db.SQLite;
 import de.rangun.pangaeablocks.listener.BlockBreakListener;
 import de.rangun.pangaeablocks.listener.PlayerInteractListener;
+import de.rangun.pangaeablocks.listener.PrepareAnvilListener;
 
 public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on 05.06.22, 00:46
 
@@ -44,19 +46,24 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		final UnlockDoorCommand unlockdoor = new UnlockDoorCommand(db);
 		final HologramCommand holo = new HologramCommand();
 		final FrameCommand frame = new FrameCommand();
+		final TicketCommand ticket = new TicketCommand(this);
 
 		getCommand("lockdoor").setExecutor(lockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("unlockdoor").setExecutor(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("hologram").setExecutor(holo); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("frame").setExecutor(frame); // NOPMD by heiko on 05.06.22, 00:52
+		getCommand("ticket").setExecutor(ticket);
 
 		getCommand("lockdoor").setTabCompleter(lockdoor); // NOPMD by heiko on 05.06.22, 00:51
 		getCommand("unlockdoor").setTabCompleter(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("hologram").setTabCompleter(holo); // NOPMD by heiko on 05.06.22, 00:51
 		getCommand("frame").setTabCompleter(frame); // NOPMD by heiko on 05.06.22, 00:51
+		getCommand("ticket").setTabCompleter(ticket);
 
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(this, db), this);
+		getServer().getPluginManager().registerEvents(new PrepareAnvilListener(this), this);
+
 	}
 
 	@Override

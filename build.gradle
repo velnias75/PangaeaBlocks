@@ -2,6 +2,7 @@ import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
     id 'java'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 apply plugin: 'java'
@@ -13,7 +14,11 @@ repositories {
 }
 
 dependencies {    
+
     compileOnly("io.papermc.paper:paper-api:${project.paper_version}")
+    
+    implementation("org.jsoup:jsoup:1.15.1")
+    
 }
 
 java {
@@ -26,3 +31,19 @@ processResources {
         filter ReplaceTokens, tokens: [version: version]
     }
 }
+
+shadowJar {
+
+	archiveClassifier.set('')
+    
+    relocate 'org.jsoup', 'de.rangun.pangaeablocks.shadowed.org.jsoup'
+
+    exclude 'META-INF/**'
+    
+    minimize()
+}
+
+assemble {
+	dependsOn shadowJar
+}
+
