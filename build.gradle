@@ -17,7 +17,10 @@ dependencies {
 
     compileOnly("io.papermc.paper:paper-api:${project.paper_version}")
     
-    implementation("org.jsoup:jsoup:1.15.1")
+    //implementation("org.jsoup:jsoup:1.15.1")
+    implementation("org.jodd:jodd-lagarto:6.0.5") {
+        exclude group: 'org.slf4j', module: 'slf4j-api'
+    }
     
 }
 
@@ -34,9 +37,10 @@ processResources {
 
 shadowJar {
 
-	archiveClassifier.set('')
+    archiveClassifier.set('')
     
-    relocate 'org.jsoup', 'de.rangun.pangaeablocks.shadowed.org.jsoup'
+    //relocate 'org.jsoup', 'de.rangun.pangaeablocks.shadowed.org.jsoup'
+    relocate 'jodd', 'de.rangun.pangaeablocks.shadowed.jodd'
 
     exclude 'META-INF/**'
     

@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 import java.util.UUID;
 
 import org.bukkit.Material;
@@ -35,14 +37,13 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.Plugin;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.select.Elements;
 
 import com.destroystokyo.paper.profile.PlayerProfile;
 import com.destroystokyo.paper.profile.ProfileProperty;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
+import jodd.jerry.Jerry;
 
 /**
  * @author heiko
@@ -98,7 +99,9 @@ public final class PrepareAnvilListener implements Listener {
 						meta.setPlayerProfile(profile);
 						head.setItemMeta(meta);
 
-						event.setResult(head);
+						if (profile.hasTextures()) {
+							event.setResult(head);
+						}
 					}
 
 				} catch (IOException e) {
@@ -114,19 +117,20 @@ public final class PrepareAnvilListener implements Listener {
 
 		try {
 
-			final Document doc = Jsoup.connect("https://minecraft-heads.com/custom-heads/" + Long.parseLong(name))
-					.get();
-			final Elements elements = doc.select("#UUID-Value");
+			final String val = Jerry
+					.of(readStringFromURL("https://minecraft-heads.com/custom-heads/" + Long.parseLong(name)))
+					.find("#UUID-Value").first().text();
 
-			return new Texture(UUID.fromString("3f8ae234-25a4-4de6-acd8-e24fa9ca0845"), elements.val()); // NOPMD by
-																											// heiko on
-																											// 08.06.22,
-																											// 07:15
+			if (!val.isEmpty()) {
+				return new Texture(UUID.fromString("3f8ae234-25a4-4de6-acd8-e24fa9ca0845"), val); // NOPMD by heiko on
+																									// 08.06.22, 17:45
+			}
+
 		} catch (NumberFormatException e4) {
 
 			final URL url_0 = new URL("https://api.mojang.com/users/profiles/minecraft/" + name);
 
-			try (InputStreamReader reader_0 = new InputStreamReader(url_0.openStream());) {
+			try (InputStreamReader reader_0 = new InputStreamReader(url_0.openStream())) {
 
 				try {
 
@@ -158,5 +162,12 @@ public final class PrepareAnvilListener implements Listener {
 		}
 
 		return null;
+	}
+
+	private String readStringFromURL(final String requestURL) throws IOException {
+		try (Scanner scanner = new Scanner(new URL(requestURL).openStream(), StandardCharsets.UTF_8.toString())) {
+			scanner.useDelimiter("\\A");
+			return scanner.hasNext() ? scanner.next() : "";
+		}
 	}
 }
