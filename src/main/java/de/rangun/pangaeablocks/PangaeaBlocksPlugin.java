@@ -24,6 +24,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 import de.rangun.pangaeablocks.commands.FrameCommand;
 import de.rangun.pangaeablocks.commands.HologramCommand;
 import de.rangun.pangaeablocks.commands.LockDoorCommand;
+import de.rangun.pangaeablocks.commands.PvPCommand;
 import de.rangun.pangaeablocks.commands.TicketCommand;
 import de.rangun.pangaeablocks.commands.UnlockDoorCommand;
 import de.rangun.pangaeablocks.db.Database;
@@ -47,18 +48,21 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		final HologramCommand holo = new HologramCommand();
 		final FrameCommand frame = new FrameCommand();
 		final TicketCommand ticket = new TicketCommand(this);
+		final PvPCommand pvp = new PvPCommand(this);
 
 		getCommand("lockdoor").setExecutor(lockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("unlockdoor").setExecutor(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("hologram").setExecutor(holo); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("frame").setExecutor(frame); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("ticket").setExecutor(ticket);
+		getCommand("pvp").setExecutor(pvp);
 
 		getCommand("lockdoor").setTabCompleter(lockdoor); // NOPMD by heiko on 05.06.22, 00:51
 		getCommand("unlockdoor").setTabCompleter(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("hologram").setTabCompleter(holo); // NOPMD by heiko on 05.06.22, 00:51
 		getCommand("frame").setTabCompleter(frame); // NOPMD by heiko on 05.06.22, 00:51
 		getCommand("ticket").setTabCompleter(ticket);
+		getCommand("pvp").setTabCompleter(pvp);
 
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(this, db), this);

@@ -25,4 +25,8 @@ commands:
     description: tbw
     permission: pangaeablocks.ticket
     usage: /ticket
-    
+  pvp:
+    description: enable/disable PvP
+    permission: pangaeablocks.pvp
+    usage: /pvp [on|off]
+   
