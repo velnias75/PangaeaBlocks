@@ -4,7 +4,7 @@ author: Velnias75
 website: https://discord.gg/kQP9QSG6F4
 version: '@version@'
 api-version: '1.18'
-softdepend: [DiscordRV, LuckPerms]
+softdepend: [DiscordSRV, LuckPerms]
 permissions:
   pangaeablocks.invsee_blocked:
     default: false
