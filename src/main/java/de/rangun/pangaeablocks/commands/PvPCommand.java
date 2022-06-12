@@ -117,7 +117,7 @@ public final class PvPCommand extends NonDefaultTabCompleter implements CommandE
 	private Component enableDisableMsg(final boolean onOff, final CommandSender sender) {
 
 		final TextColor textColor = onOff ? NamedTextColor.RED : NamedTextColor.GREEN;
-		final TextDecoration deco = onOff ? TextDecoration.BOLD : null;
+		final TextDecoration deco = TextDecoration.BOLD;
 
 		return Component.text("PvP ", textColor, deco)
 				.append(Component.text(onOff ? "enabled" : "disabled", textColor, TextDecoration.ITALIC))

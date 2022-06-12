@@ -30,9 +30,12 @@ import de.rangun.pangaeablocks.commands.TicketCommand;
 import de.rangun.pangaeablocks.commands.UnlockDoorCommand;
 import de.rangun.pangaeablocks.db.Database;
 import de.rangun.pangaeablocks.db.SQLite;
+import de.rangun.pangaeablocks.listener.AsyncPlayerPreLoginListener;
 import de.rangun.pangaeablocks.listener.BlockBreakListener;
+import de.rangun.pangaeablocks.listener.EntityDeathListener;
 import de.rangun.pangaeablocks.listener.InventoryClickListener;
 import de.rangun.pangaeablocks.listener.PlayerInteractListener;
+import de.rangun.pangaeablocks.listener.PlayerJoinListener;
 import de.rangun.pangaeablocks.listener.PrepareAnvilListener;
 
 public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on 05.06.22, 00:46
@@ -68,10 +71,13 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getCommand("ticket").setTabCompleter(ticket);
 		getCommand("pvp").setTabCompleter(pvp);
 
+		getServer().getPluginManager().registerEvents(new AsyncPlayerPreLoginListener(), this);
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new PrepareAnvilListener(this), this);
 		getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
+		getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+		getServer().getPluginManager().registerEvents(new EntityDeathListener(), this);
 	}
 
 	@Override

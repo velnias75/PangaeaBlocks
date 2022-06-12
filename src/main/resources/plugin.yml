@@ -4,9 +4,12 @@ author: Velnias75
 website: https://discord.gg/kQP9QSG6F4
 version: '@version@'
 api-version: '1.18'
+softdepend: [DiscordRV, LuckPerms]
 permissions:
-   pangaeablocks.invsee_blocked:
-     default: false
+  pangaeablocks.invsee_blocked:
+    default: false
+  pangaeablocks.welcome_new_players:
+    defult: op
 commands:
   lockdoor:
     description: locks resp. protects a door/gate/trapdoor
