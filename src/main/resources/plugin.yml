@@ -4,6 +4,9 @@ author: Velnias75
 website: https://discord.gg/kQP9QSG6F4
 version: '@version@'
 api-version: '1.18'
+permissions:
+   pangaeablocks.invsee_blocked:
+     default: false
 commands:
   lockdoor:
     description: locks resp. protects a door/gate/trapdoor
@@ -29,4 +32,8 @@ commands:
     description: enable/disable PvP
     permission: pangaeablocks.pvp
     usage: /pvp [on|off]
-   
+  invsee:
+    description: tbw
+    permission: pangaeablocks.invsee
+    usage: /invsee [player]   
+ 

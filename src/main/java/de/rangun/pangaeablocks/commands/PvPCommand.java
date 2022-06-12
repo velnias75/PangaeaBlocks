@@ -32,15 +32,16 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.scoreboard.Scoreboard;
-import org.bukkit.scoreboard.Team;
 
 import com.google.common.collect.ImmutableList;
 
+import de.rangun.pangaeablocks.utils.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.audience.MessageType;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 /**
  * @author heiko
@@ -60,12 +61,6 @@ public final class PvPCommand extends NonDefaultTabCompleter implements CommandE
 	public boolean onCommand(final CommandSender sender, final Command command, final String label, // NOPMD by heiko on
 																									// 09.06.22, 11:33
 			final String[] args) {
-
-		final Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
-		final Team team = sender instanceof Player ? scoreboard.getEntityTeam((Player) sender) : null;
-		final TextColor color = team != null ? team.color() : null;
-		final Component prefix = team != null ? team.prefix().color(color) : Component.text("");
-		final Component suffix = team != null ? team.suffix().color(color) : Component.text("");
 
 		final List<World> worlds = plugin.getServer().getWorlds().stream().filter(world -> {
 			return Environment.NORMAL.equals(world.getEnvironment());
@@ -106,19 +101,27 @@ public final class PvPCommand extends NonDefaultTabCompleter implements CommandE
 
 				if ("on".equalsIgnoreCase(args[0])) {
 					world.setPVP(true);
-					Audience.audience(audience).sendMessage(Component.text("PvP enabled by ").append(prefix)
-							.append(Component.text(sender.getName(), color)).append(suffix));
+					Audience.audience(audience).sendMessage(enableDisableMsg(true, sender));
 				}
 
 				if ("off".equalsIgnoreCase(args[0])) {
 					world.setPVP(false);
-					Audience.audience(audience).sendMessage(Component.text("PvP disabled by ").append(prefix)
-							.append(Component.text(sender.getName(), color)).append(suffix));
+					Audience.audience(audience).sendMessage(enableDisableMsg(false, sender));
 				}
 			}
 		}
 
 		return true;
+	}
+
+	private Component enableDisableMsg(final boolean onOff, final CommandSender sender) {
+
+		final TextColor textColor = onOff ? NamedTextColor.RED : NamedTextColor.GREEN;
+		final TextDecoration deco = onOff ? TextDecoration.BOLD : null;
+
+		return Component.text("PvP ", textColor, deco)
+				.append(Component.text(onOff ? "enabled" : "disabled", textColor, TextDecoration.ITALIC))
+				.append(Component.text(" by ", textColor, deco)).append(Utils.getTeamFormattedPlayer((Player) sender));
 	}
 
 	@Override

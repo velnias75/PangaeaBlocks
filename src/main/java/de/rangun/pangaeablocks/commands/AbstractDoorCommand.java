@@ -76,13 +76,14 @@ abstract class AbstractDoorCommand extends NonDefaultTabCompleter implements Com
 						.append(Component.text(block.getY())).append(Component.text(", "))
 						.append(Component.text(block.getZ())).append(Component.text(" ("))
 						.append(Component.text(block.getWorld().getKey().asString()))
-						.append(Component.text(") " + status() + " ")).append(Component.text(
-								EVERYBODY.equals(args.length > 0 ? args[0] : null) ? EVERYBODY : player.getName()))); // NOPMD
-																														// by
-																														// heiko
-																														// on
-																														// 05.06.22,
-																														// 00:57
+						.append(Component.text(") " + status() + " "))
+						.append(EVERYBODY.equals(args.length > 0 ? args[0] : null) ? Component.text(EVERYBODY) // NOPMD
+																												// by
+																												// heiko
+																												// on
+																												// 12.06.22,
+																												// 09:08
+								: Utils.getTeamFormattedPlayer(player)));
 			}
 
 		} else {
