@@ -49,27 +49,44 @@ public final class EntityDeathListener implements Listener { // NOPMD by heiko o
 
 		final Collection<? extends Player> players = Bukkit.getOnlinePlayers();
 
-		if (EntityType.VILLAGER.equals(event.getEntityType()) && players.contains(event.getEntity().getKiller())) {
+		if (EntityType.VILLAGER.equals(event.getEntityType())) {
 
 			final Villager villager = (Villager) event.getEntity();
 
-			final Component prof = Component.translatable(villager.getProfession());
-			final Component name = villager.customName() != null
-					? villager.customName().colorIfAbsent(NamedTextColor.AQUA)
-							.append(Component.text(" (", NamedTextColor.DARK_AQUA)
-									.append(prof.colorIfAbsent(NamedTextColor.DARK_AQUA))
-									.append(Component.text(")", NamedTextColor.DARK_AQUA)))
-					: prof.colorIfAbsent(NamedTextColor.DARK_AQUA);
+			final boolean killed = players.contains(event.getEntity().getKiller());
+			final boolean died = !killed && villager.customName() != null;
 
-			final Location location = villager.getLocation();
+			if (killed || died) {
 
-			Audience.audience(players)
-					.sendMessage(Component.text("FATAL: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
-							.append(Utils.getTeamFormattedPlayer(event.getEntity().getKiller()))
-							.append(Component.text(" cowardly killed ", NamedTextColor.RED).append(name)
-									.hoverEvent(HoverEvent.showText(Component.text("Click to teleport")))
-									.clickEvent(ClickEvent.runCommand("/tp " + location.getBlockX() + " "
-											+ location.getBlockY() + " " + location.getBlockZ()))));
+				final Location location = villager.getLocation();
+				final String dimension = villager.getWorld().getKey().asString();
+
+				final Component prof = Component.translatable(villager.getProfession());
+				final Component name = (villager.customName() != null
+						? villager.customName().colorIfAbsent(NamedTextColor.AQUA)
+								.append(Component.text(" (", NamedTextColor.DARK_AQUA)
+										.append(prof.colorIfAbsent(NamedTextColor.DARK_AQUA))
+										.append(Component.text(")", NamedTextColor.DARK_AQUA)))
+						: prof.colorIfAbsent(NamedTextColor.DARK_AQUA))
+						.hoverEvent(HoverEvent.showText(Component.text("Click to teleport")))
+						.clickEvent(ClickEvent.runCommand("/execute in " + dimension + " run tp " + location.getX()
+								+ " " + location.getY() + " " + location.getZ()));
+
+				if (died) {
+
+					Audience.audience(players)
+							.sendMessage(Component.text("SAD: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
+									.append(Component.text("Villager ", NamedTextColor.YELLOW)).append(name)
+									.append(Component.text(" died!", NamedTextColor.YELLOW)));
+
+				} else if (killed) {
+
+					Audience.audience(players)
+							.sendMessage(Component.text("FATAL: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
+									.append(Utils.getTeamFormattedPlayer(event.getEntity().getKiller()))
+									.append(Component.text(" cowardly killed ", NamedTextColor.RED).append(name)));
+				}
+			}
 		}
 	}
 }
