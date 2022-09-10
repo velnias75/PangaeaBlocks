@@ -19,6 +19,7 @@
 
 package de.rangun.pangaeablocks;
 
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.rangun.pangaeablocks.commands.FrameCommand;
@@ -44,6 +45,10 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 
 	@Override
 	public void onEnable() {
+
+		saveDefaultConfig();
+
+		final FileConfiguration config = getConfig();
 
 		this.db = new SQLite(this);
 		this.db.open();
@@ -71,7 +76,8 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getCommand("ticket").setTabCompleter(ticket);
 		getCommand("pvp").setTabCompleter(pvp);
 
-		getServer().getPluginManager().registerEvents(new AsyncPlayerPreLoginListener(), this);
+		getServer().getPluginManager()
+				.registerEvents(new AsyncPlayerPreLoginListener(getConfig().getString("discord-url")), this);
 		getServer().getPluginManager().registerEvents(new PlayerInteractListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new PrepareAnvilListener(this), this);

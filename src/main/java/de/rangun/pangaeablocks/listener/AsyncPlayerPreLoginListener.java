@@ -38,6 +38,12 @@ import net.kyori.adventure.text.format.TextDecoration;
  */
 public final class AsyncPlayerPreLoginListener implements Listener { // NOPMD by heiko on 12.06.22, 11:14
 
+	private final String discordURL;
+
+	public AsyncPlayerPreLoginListener(final String discordURL) {
+		this.discordURL = discordURL;
+	}
+
 	@EventHandler(priority = EventPriority.LOWEST)
 	public void onAsyncPlayerPreLoginEvent(final AsyncPlayerPreLoginEvent event) {
 
@@ -45,9 +51,8 @@ public final class AsyncPlayerPreLoginListener implements Listener { // NOPMD by
 
 		if (Bukkit.hasWhitelist() && !oPlayer.isWhitelisted()) {
 
-			final Component discord = Component.text("https://discord.gg/kQP9QSG6F4")
-					.clickEvent(ClickEvent.openUrl("https://discord.gg/kQP9QSG6F4")).color(NamedTextColor.DARK_GREEN)
-					.decorate(TextDecoration.UNDERLINED);
+			final Component discord = Component.text(discordURL).clickEvent(ClickEvent.openUrl(discordURL))
+					.color(NamedTextColor.DARK_GREEN).decorate(TextDecoration.UNDERLINED);
 
 			event.kickMessage(Component
 					.text("Du bist nicht auf der weissen Liste!", NamedTextColor.RED, TextDecoration.BOLD)
@@ -55,7 +60,7 @@ public final class AsyncPlayerPreLoginListener implements Listener { // NOPMD by
 
 			event.setLoginResult(Result.KICK_WHITELIST);
 
-		} else if (!oPlayer.hasPlayedBefore() && Bukkit.getOnlinePlayers().stream()
+		} else if (!oPlayer.isOp() && !oPlayer.hasPlayedBefore() && Bukkit.getOnlinePlayers().stream()
 				.filter(player -> player.hasPermission("pangaeablocks.welcome_new_players")).toList().isEmpty()) {
 
 			event.kickMessage(Component.text("Im Moment ist kein Spieler Online, der Dich auf ")
