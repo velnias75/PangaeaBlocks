@@ -3,13 +3,15 @@ name: PangaeaBlocks
 author: Velnias75
 website: https://discord.gg/kQP9QSG6F4
 version: '@version@'
-api-version: '1.18'
+api-version: '1.19'
 softdepend: [DiscordSRV, LuckPerms]
 permissions:
   pangaeablocks.invsee_blocked:
     default: false
   pangaeablocks.welcome_new_players:
-    defult: op
+    default: op
+  pangaeablocks.taxi.give:
+    default: op
 commands:
   lockdoor:
     description: locks resp. protects a door/gate/trapdoor
@@ -38,5 +40,8 @@ commands:
   invsee:
     description: tbw
     permission: pangaeablocks.invsee
-    usage: /invsee [player]   
- 
+    usage: /invsee [player]
+  taxi:
+    description: tbw
+    permission: pangaeablocks.taxi
+    usage: /taxi

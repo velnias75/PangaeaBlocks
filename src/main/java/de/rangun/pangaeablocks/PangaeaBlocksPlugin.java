@@ -19,7 +19,6 @@
 
 package de.rangun.pangaeablocks;
 
-import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.rangun.pangaeablocks.commands.FrameCommand;
@@ -27,6 +26,7 @@ import de.rangun.pangaeablocks.commands.HologramCommand;
 import de.rangun.pangaeablocks.commands.InvseeCommand;
 import de.rangun.pangaeablocks.commands.LockDoorCommand;
 import de.rangun.pangaeablocks.commands.PvPCommand;
+import de.rangun.pangaeablocks.commands.TaxiCommand;
 import de.rangun.pangaeablocks.commands.TicketCommand;
 import de.rangun.pangaeablocks.commands.UnlockDoorCommand;
 import de.rangun.pangaeablocks.db.Database;
@@ -48,7 +48,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 
 		saveDefaultConfig();
 
-		final FileConfiguration config = getConfig();
+		// final FileConfiguration config = getConfig();
 
 		this.db = new SQLite(this);
 		this.db.open();
@@ -60,6 +60,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		final TicketCommand ticket = new TicketCommand(this);
 		final PvPCommand pvp = new PvPCommand(this);
 		final InvseeCommand inv = new InvseeCommand();
+		final TaxiCommand taxi = new TaxiCommand();
 
 		getCommand("lockdoor").setExecutor(lockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("unlockdoor").setExecutor(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
@@ -68,6 +69,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getCommand("ticket").setExecutor(ticket);
 		getCommand("pvp").setExecutor(pvp);
 		getCommand("invsee").setExecutor(inv);
+		getCommand("taxi").setExecutor(taxi);
 
 		getCommand("lockdoor").setTabCompleter(lockdoor); // NOPMD by heiko on 05.06.22, 00:51
 		getCommand("unlockdoor").setTabCompleter(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
@@ -75,6 +77,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getCommand("frame").setTabCompleter(frame); // NOPMD by heiko on 05.06.22, 00:51
 		getCommand("ticket").setTabCompleter(ticket);
 		getCommand("pvp").setTabCompleter(pvp);
+		getCommand("taxi").setTabCompleter(taxi);
 
 		getServer().getPluginManager()
 				.registerEvents(new AsyncPlayerPreLoginListener(getConfig().getString("discord-url")), this);
