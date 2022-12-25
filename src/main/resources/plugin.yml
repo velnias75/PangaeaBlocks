@@ -1,10 +1,11 @@
 main: de.rangun.pangaeablocks.PangaeaBlocksPlugin
 name: PangaeaBlocks
 author: Velnias75
-website: https://discord.gg/kQP9QSG6F4
+website: https://discord.gg/tkX9BcwCCS
 version: '@version@'
 api-version: '1.19'
 softdepend: [DiscordSRV, LuckPerms]
+depend: [PinkBull]
 permissions:
   pangaeablocks.invsee_blocked:
     default: false

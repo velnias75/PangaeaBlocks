@@ -19,6 +19,7 @@
 
 package de.rangun.pangaeablocks;
 
+import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import de.rangun.pangaeablocks.commands.FrameCommand;
@@ -38,10 +39,15 @@ import de.rangun.pangaeablocks.listener.InventoryClickListener;
 import de.rangun.pangaeablocks.listener.PlayerInteractListener;
 import de.rangun.pangaeablocks.listener.PlayerJoinListener;
 import de.rangun.pangaeablocks.listener.PrepareAnvilListener;
+import de.rangun.pangaeablocks.somnia.SomniaRunnable;
+import github.scarsz.discordsrv.DiscordSRV;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
 public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on 05.06.22, 00:46
 
 	private Database db; // NOPMD by heiko on 05.06.22, 00:50
+	private boolean discordSRVavail;
 
 	@Override
 	public void onEnable() {
@@ -61,6 +67,8 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		final PvPCommand pvp = new PvPCommand(this);
 		final InvseeCommand inv = new InvseeCommand();
 		final TaxiCommand taxi = new TaxiCommand();
+
+		discordSRVavail = getServer().getPluginManager().getPlugin("DiscordSRV") != null;
 
 		getCommand("lockdoor").setExecutor(lockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("unlockdoor").setExecutor(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
@@ -87,10 +95,21 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
 		getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 		getServer().getPluginManager().registerEvents(new EntityDeathListener(), this);
+
+		(new SomniaRunnable(this)).runTaskTimer(this, 20L, 20L);
 	}
 
 	@Override
 	public void onDisable() {
 		this.db.vacuum();
+	}
+
+	public void sendToDiscordSRV(final Component message, final Player player) {
+
+		if (discordSRVavail) {
+			DiscordSRV.getPlugin().processChatMessage(player,
+					LegacyComponentSerializer.builder().build().serialize(message),
+					DiscordSRV.getPlugin().getMainChatChannel(), false, null);
+		}
 	}
 }

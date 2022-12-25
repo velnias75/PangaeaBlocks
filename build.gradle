@@ -10,12 +10,23 @@ apply plugin: 'java'
 version = '0.0-SNAPSHOT'
 
 repositories {
+	mavenLocal()
+    
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+    
+    maven {
+		name 'm2-dv8tion'
+		url 'https://m2.dv8tion.net/releases'
+	}
+
+	maven { url 'https://nexus.scarsz.me/content/groups/public/' }
 }
 
 dependencies {    
 
     compileOnly("io.papermc.paper:paper-api:${project.paper_version}")
+    compileOnly("de.rangun:PinkBull:${project.pinkbull_version}")
+    compileOnly "com.discordsrv:discordsrv:${project.discordsrv_version}"
     
     //implementation("org.jsoup:jsoup:1.15.1")
     implementation("org.jodd:jodd-lagarto:6.0.5") {
