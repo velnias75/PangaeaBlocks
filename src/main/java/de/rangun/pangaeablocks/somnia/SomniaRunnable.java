@@ -25,13 +25,18 @@ import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.player.PlayerKickEvent.Cause;
+import org.bukkit.inventory.ItemStack;
+import org.bukkit.persistence.PersistentDataContainer;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import de.rangun.pangaeablocks.PangaeaBlocksPlugin;
+import de.rangun.pangaeablocks.utils.Utils;
+import de.rangun.pangaeablocks.utils.Utils.UUIDTagType;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.key.Key;
 import net.kyori.adventure.sound.Sound;
@@ -68,7 +73,9 @@ public final class SomniaRunnable extends BukkitRunnable {
 					.decoration(TextDecoration.ITALIC, true));
 
 	private final TextComponent PUNISH = Component.text(" wurde von den ")
-			.append(Component.text("Vogelsberger Lohen").color(NamedTextColor.GOLD)).append(Component.text(" wegen "))
+			.append(Component.text("Vogelsberger Lohen").color(NamedTextColor.GOLD).decoration(TextDecoration.BOLD,
+					true))
+			.append(Component.text(" wegen "))
 			.append(Component.text("Nicht-Schlafens").decoration(TextDecoration.ITALIC, true))
 			.append(Component.text(" bestraft!"));
 
@@ -77,6 +84,9 @@ public final class SomniaRunnable extends BukkitRunnable {
 	private boolean doSomniaKick = true;
 
 	private final PangaeaBlocksPlugin plugin;
+
+	public final static NamespacedKey SOMNIA_KEY = new NamespacedKey("pangaea_blocks", "somnia");
+	private final static UUIDTagType UUID_TYPE = new Utils.UUIDTagType();
 
 	public SomniaRunnable(final PangaeaBlocksPlugin plugin) {
 		super();
@@ -112,7 +122,7 @@ public final class SomniaRunnable extends BukkitRunnable {
 				for (final Player p : getOverworldPlayers()) {
 
 					final Component punishText = Component.empty()
-							.append(p.displayName().color(NamedTextColor.AQUA).decoration(TextDecoration.BOLD, true))
+							.append(Utils.getTeamFormattedPlayer(p).decoration(TextDecoration.BOLD, true))
 							.append(PUNISH);
 
 					p.kick(KICK, Cause.PLUGIN);
@@ -120,6 +130,13 @@ public final class SomniaRunnable extends BukkitRunnable {
 					Audience.audience(Bukkit.getOnlinePlayers()).sendMessage(punishText);
 					plugin.sendToDiscordSRV(Component.text("... ").append(PUNISH), p);
 				}
+
+				Bukkit.getOnlinePlayers().forEach(p -> {
+					if (isPlayerHoldingSomniaCookie(p) && Environment.NORMAL.equals(p.getWorld().getEnvironment())
+							&& !GameMode.SPECTATOR.equals(p.getGameMode())) {
+						p.getInventory().getItemInOffHand().subtract();
+					}
+				});
 
 				doSomniaKick = false;
 
@@ -134,8 +151,20 @@ public final class SomniaRunnable extends BukkitRunnable {
 
 	private static List<? extends Player> getOverworldPlayers() {
 		return Bukkit.getOnlinePlayers().stream()
-				.filter(p -> Environment.NORMAL.equals(p.getWorld().getEnvironment())
+				.filter(p -> !isPlayerHoldingSomniaCookie(p) && Environment.NORMAL.equals(p.getWorld().getEnvironment())
 						&& !GameMode.SPECTATOR.equals(p.getGameMode()) && (!p.isSleeping() || p.isSleepingIgnored()))
 				.collect(Collectors.toList());
+	}
+
+	private static boolean isPlayerHoldingSomniaCookie(final Player player) {
+
+		final ItemStack offHandItem = player.getInventory().getItemInOffHand();
+		final PersistentDataContainer container = offHandItem.hasItemMeta()
+				? offHandItem.getItemMeta().getPersistentDataContainer()
+				: null;
+
+		return player.hasPermission("pangaeablocks.somnia_cookie") && container != null
+				&& container.has(SOMNIA_KEY, UUID_TYPE)
+				&& player.getUniqueId().equals(container.get(SOMNIA_KEY, UUID_TYPE));
 	}
 }

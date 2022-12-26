@@ -19,6 +19,8 @@
 
 package de.rangun.pangaeablocks;
 
+import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -39,6 +41,8 @@ import de.rangun.pangaeablocks.listener.InventoryClickListener;
 import de.rangun.pangaeablocks.listener.PlayerInteractListener;
 import de.rangun.pangaeablocks.listener.PlayerJoinListener;
 import de.rangun.pangaeablocks.listener.PrepareAnvilListener;
+import de.rangun.pangaeablocks.somnia.SomniaListener;
+import de.rangun.pangaeablocks.somnia.SomniaRecipe;
 import de.rangun.pangaeablocks.somnia.SomniaRunnable;
 import github.scarsz.discordsrv.DiscordSRV;
 import net.kyori.adventure.text.Component;
@@ -48,6 +52,10 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 
 	private Database db; // NOPMD by heiko on 05.06.22, 00:50
 	private boolean discordSRVavail;
+
+	public final NamespacedKey SOMNIA_KEY = new NamespacedKey(this, "somnia_recipe");
+
+	private final LegacyComponentSerializer serializer = LegacyComponentSerializer.builder().build();
 
 	@Override
 	public void onEnable() {
@@ -96,7 +104,10 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 		getServer().getPluginManager().registerEvents(new EntityDeathListener(), this);
 
-		(new SomniaRunnable(this)).runTaskTimer(this, 20L, 20L);
+		(new SomniaRunnable(this)).runTaskTimer(this, 0L, 10L);
+		Bukkit.addRecipe(new SomniaRecipe(this));
+
+		getServer().getPluginManager().registerEvents(new SomniaListener(this), this);
 	}
 
 	@Override
@@ -107,8 +118,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 	public void sendToDiscordSRV(final Component message, final Player player) {
 
 		if (discordSRVavail) {
-			DiscordSRV.getPlugin().processChatMessage(player,
-					LegacyComponentSerializer.builder().build().serialize(message),
+			DiscordSRV.getPlugin().processChatMessage(player, serializer.serialize(message),
 					DiscordSRV.getPlugin().getMainChatChannel(), false, null);
 		}
 	}

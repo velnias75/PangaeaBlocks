@@ -19,12 +19,17 @@
 
 package de.rangun.pangaeablocks.utils;
 
+import java.nio.ByteBuffer;
+import java.util.UUID;
+
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.block.data.Bisected.Half;
 import org.bukkit.block.data.type.Door;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.HumanEntity;
+import org.bukkit.persistence.PersistentDataAdapterContext;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
@@ -38,6 +43,40 @@ import net.kyori.adventure.text.format.TextColor;
 public final class Utils {
 
 	private Utils() {
+	}
+
+	public static class UUIDTagType implements PersistentDataType<byte[], UUID> {
+
+		@Override
+		public Class<byte[]> getPrimitiveType() {
+			return byte[].class;
+		}
+
+		@Override
+		public Class<UUID> getComplexType() {
+			return UUID.class;
+		}
+
+		@Override
+		public byte[] toPrimitive(final UUID complex, final PersistentDataAdapterContext context) {
+
+			final ByteBuffer bb = ByteBuffer.wrap(new byte[16]); // NOPMD by heiko on 26.12.22, 01:10
+
+			bb.putLong(complex.getMostSignificantBits());
+			bb.putLong(complex.getLeastSignificantBits());
+
+			return bb.array();
+		}
+
+		@Override
+		public UUID fromPrimitive(final byte[] primitive, final PersistentDataAdapterContext context) {
+
+			final ByteBuffer bb = ByteBuffer.wrap(primitive); // NOPMD by heiko on 26.12.22, 01:10
+			final long firstLong = bb.getLong();
+			final long secondLong = bb.getLong();
+
+			return new UUID(firstLong, secondLong);
+		}
 	}
 
 	public static Block doorBottom(final Block block) {
@@ -54,7 +93,7 @@ public final class Utils {
 				: block;
 	}
 
-	public static Component getTeamFormattedPlayer(final Player player) {
+	public static Component getTeamFormattedPlayer(final HumanEntity player) {
 
 		final Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
 		final Team team = scoreboard.getEntityTeam(player);

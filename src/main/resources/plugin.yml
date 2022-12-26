@@ -13,6 +13,8 @@ permissions:
     default: op
   pangaeablocks.taxi.give:
     default: op
+  pangaeablocks.somnia_cookie:
+    default: false
 commands:
   lockdoor:
     description: locks resp. protects a door/gate/trapdoor
