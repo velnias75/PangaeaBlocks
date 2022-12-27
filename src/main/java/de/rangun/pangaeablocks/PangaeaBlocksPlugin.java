@@ -45,6 +45,8 @@ import de.rangun.pangaeablocks.somnia.SomniaListener;
 import de.rangun.pangaeablocks.somnia.SomniaRecipe;
 import de.rangun.pangaeablocks.somnia.SomniaRunnable;
 import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.util.DiscordUtil;
+import github.scarsz.discordsrv.util.MessageUtil;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
@@ -55,7 +57,8 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 
 	public final NamespacedKey SOMNIA_KEY = new NamespacedKey(this, "somnia_recipe");
 
-	private final LegacyComponentSerializer serializer = LegacyComponentSerializer.builder().build();
+	private final LegacyComponentSerializer serializer = LegacyComponentSerializer.builder().extractUrls().hexColors()
+			.useUnusualXRepeatedCharacterHexFormat().build();
 
 	@Override
 	public void onEnable() {
@@ -102,7 +105,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getServer().getPluginManager().registerEvents(new PrepareAnvilListener(this), this);
 		getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
 		getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
-		getServer().getPluginManager().registerEvents(new EntityDeathListener(), this);
+		getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
 
 		(new SomniaRunnable(this)).runTaskTimer(this, 0L, 10L);
 		Bukkit.addRecipe(new SomniaRecipe(this));
@@ -118,8 +121,18 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 	public void sendToDiscordSRV(final Component message, final Player player) {
 
 		if (discordSRVavail) {
-			DiscordSRV.getPlugin().processChatMessage(player, serializer.serialize(message),
-					DiscordSRV.getPlugin().getMainChatChannel(), false, null);
+
+			if (player != null) {
+
+				DiscordSRV.getPlugin().processChatMessage(player, serializer.serialize(message),
+						DiscordSRV.getPlugin().getMainChatChannel(), false, null);
+
+			} else {
+				DiscordUtil.queueMessage(DiscordSRV.getPlugin().getOptionalTextChannel("broadcasts"),
+						MessageUtil.reserializeToDiscord(
+								MessageUtil.toComponent(MessageUtil.translateLegacy(serializer.serialize(message)))),
+						true);
+			}
 		}
 	}
 }

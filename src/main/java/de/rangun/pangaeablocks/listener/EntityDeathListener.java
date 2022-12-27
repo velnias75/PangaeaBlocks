@@ -30,6 +30,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDeathEvent;
 
+import de.rangun.pangaeablocks.PangaeaBlocksPlugin;
 import de.rangun.pangaeablocks.utils.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
@@ -42,7 +43,13 @@ import net.kyori.adventure.text.format.TextDecoration;
  * @author heiko
  *
  */
-public final class EntityDeathListener implements Listener { // NOPMD by heiko on 12.06.22, 16:23
+public final class EntityDeathListener implements Listener {
+
+	private final PangaeaBlocksPlugin plugin;
+
+	public EntityDeathListener(final PangaeaBlocksPlugin plugin) {
+		this.plugin = plugin;
+	}
 
 	@EventHandler
 	public void onEntityDeathEvent(final EntityDeathEvent event) {
@@ -74,17 +81,21 @@ public final class EntityDeathListener implements Listener { // NOPMD by heiko o
 
 				if (died) {
 
-					Audience.audience(players)
-							.sendMessage(Component.text("SAD: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
-									.append(Component.text("Villager ", NamedTextColor.YELLOW)).append(name)
-									.append(Component.text(" died!", NamedTextColor.YELLOW)));
+					final Component diedMsg = Component.text("SAD: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
+							.append(Component.text("Villager ", NamedTextColor.YELLOW)).append(name)
+							.append(Component.text(" died!", NamedTextColor.YELLOW));
+
+					Audience.audience(players).sendMessage(diedMsg);
+					plugin.sendToDiscordSRV(diedMsg, null);
 
 				} else if (killed) {
 
-					Audience.audience(players)
-							.sendMessage(Component.text("FATAL: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
-									.append(Utils.getTeamFormattedPlayer(event.getEntity().getKiller()))
-									.append(Component.text(" cowardly killed ", NamedTextColor.RED).append(name)));
+					final Component killedMsg = Component.text("FATAL: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
+							.append(Utils.getTeamFormattedPlayer(event.getEntity().getKiller()))
+							.append(Component.text(" cowardly killed ", NamedTextColor.RED).append(name));
+
+					Audience.audience(players).sendMessage(killedMsg);
+					plugin.sendToDiscordSRV(killedMsg, event.getEntity().getKiller());
 				}
 			}
 		}
