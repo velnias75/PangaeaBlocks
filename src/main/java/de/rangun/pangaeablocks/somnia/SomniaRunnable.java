@@ -82,6 +82,7 @@ public final class SomniaRunnable extends BukkitRunnable {
 	private boolean doSomniaAdvent = true;
 	private boolean doSomniaSoundTitle = true; // NOPMD by heiko on 25.12.22, 03:28
 	private boolean doSomniaKick = true;
+	private boolean unsetSleepIgnore;
 
 	private final PangaeaBlocksPlugin plugin;
 
@@ -107,6 +108,7 @@ public final class SomniaRunnable extends BukkitRunnable {
 
 				Audience.audience(getOverworldPlayers()).sendMessage(NIGHTADVENT);
 				doSomniaAdvent = false;
+				unsetSleepIgnore = true;
 
 			} else if (dayTime >= 12_540L && dayTime < 12_942L && doSomniaSoundTitle) {
 
@@ -115,7 +117,16 @@ public final class SomniaRunnable extends BukkitRunnable {
 				audience.playSound(BELL);
 				audience.showTitle(TITLE);
 
+				Bukkit.getOnlinePlayers().stream()
+						.filter(p -> isPlayerHoldingSomniaCookie(p)
+								&& Environment.NORMAL.equals(p.getWorld().getEnvironment())
+								&& !GameMode.SPECTATOR.equals(p.getGameMode()))
+						.forEach(p -> {
+							p.setSleepingIgnored(true);
+						});
+
 				doSomniaSoundTitle = false;
+				unsetSleepIgnore = true;
 
 			} else if (dayTime >= 12_942L && doSomniaKick) {
 
@@ -139,8 +150,20 @@ public final class SomniaRunnable extends BukkitRunnable {
 				});
 
 				doSomniaKick = false;
+				unsetSleepIgnore = true;
 
 			} else if (dayTime >= 0L && dayTime < 11_615L) {
+
+				if (unsetSleepIgnore) {
+					Bukkit.getOnlinePlayers().stream()
+							.filter(p -> Environment.NORMAL.equals(p.getWorld().getEnvironment())
+									&& !GameMode.SPECTATOR.equals(p.getGameMode()))
+							.forEach(p -> {
+								p.setSleepingIgnored(false);
+							});
+
+					unsetSleepIgnore = false;
+				}
 
 				doSomniaAdvent = true;
 				doSomniaSoundTitle = true;
