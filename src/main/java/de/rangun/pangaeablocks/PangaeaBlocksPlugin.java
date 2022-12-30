@@ -17,7 +17,10 @@
  * along with PangaeaBlocks.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package de.rangun.pangaeablocks;
+package de.rangun.pangaeablocks; // NOPMD by heiko on 29.12.22, 06:40
+
+import java.util.Collections;
+import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
@@ -60,6 +63,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 	private final LegacyComponentSerializer serializer = LegacyComponentSerializer.builder().extractUrls().hexColors()
 			.useUnusualXRepeatedCharacterHexFormat().build();
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void onEnable() {
 
@@ -107,10 +111,16 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
 		getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
 
-		(new SomniaRunnable(this)).runTaskTimer(this, 0L, 10L);
+		(new SomniaRunnable(this, getConfig().getBoolean("somnia_require_permission", true))).runTaskTimer(this, 0L,
+				10L);
 		Bukkit.addRecipe(new SomniaRecipe(this));
 
-		getServer().getPluginManager().registerEvents(new SomniaListener(this), this);
+		getServer().getPluginManager().registerEvents(
+				new SomniaListener(this,
+						getConfig().getBoolean("somnia_require_permission", true)
+								? (List<String>) getConfig().getList("moderators", Collections.EMPTY_LIST)
+								: null), // NOPMD by heiko on 29.12.22, 06:40
+				this);
 	}
 
 	@Override

@@ -21,10 +21,12 @@ package de.rangun.pangaeablocks.somnia;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
 import org.bukkit.World;
 import org.bukkit.World.Environment;
@@ -43,6 +45,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.title.Title;
 import net.kyori.adventure.title.Title.Times;
@@ -51,7 +54,7 @@ import net.kyori.adventure.title.Title.Times;
  * @author heiko
  *
  */
-public final class SomniaRunnable extends BukkitRunnable {
+public final class SomniaRunnable extends BukkitRunnable { // NOPMD by heiko on 28.12.22, 01:38
 
 	private final static TextComponent NIGHTADVENT = Component.text("[Server] ")
 			.append(Component.text("Es wird allmählich "))
@@ -79,23 +82,39 @@ public final class SomniaRunnable extends BukkitRunnable {
 			.append(Component.text("Nicht-Schlafens").decoration(TextDecoration.ITALIC, true))
 			.append(Component.text(" bestraft!"));
 
+	private final TextComponent COOKIE = Component
+			.text(" hat sich mit einem ").append(Component.text("Somnia-Keks").color(TextColor.color(184, 115, 51))
+					.decoration(TextDecoration.ITALIC, true))
+			.append(Component.text(" von der Schlafpflicht frei gekauft.")).color(NamedTextColor.GRAY);
+
+	private final TextComponent BEFORE_DAY = Component.newline()
+			.append(Component.text("... während es weiter vor sich hin nachtet.").color(NamedTextColor.GRAY));
+
+	private final TextComponent AFTER_DAY = Component.newline()
+			.append(Component.text("... trotz, dass alle anderen Pangäa-Bewohner sich brav schlafen gelegt haben.")
+					.color(NamedTextColor.GRAY));
+
 	private boolean doSomniaAdvent = true;
 	private boolean doSomniaSoundTitle = true; // NOPMD by heiko on 25.12.22, 03:28
 	private boolean doSomniaKick = true;
+	private boolean doSomniaCookie = true;
 	private boolean unsetSleepIgnore;
+
+	private final boolean requirePermission;
 
 	private final PangaeaBlocksPlugin plugin;
 
 	public final static NamespacedKey SOMNIA_KEY = new NamespacedKey("pangaea_blocks", "somnia");
 	private final static UUIDTagType UUID_TYPE = new Utils.UUIDTagType();
 
-	public SomniaRunnable(final PangaeaBlocksPlugin plugin) {
+	public SomniaRunnable(final PangaeaBlocksPlugin plugin, final boolean requirePermission) {
 		super();
 		this.plugin = plugin;
+		this.requirePermission = requirePermission;
 	}
 
 	@Override
-	public void run() {
+	public void run() { // NOPMD by heiko on 28.12.22, 01:37
 
 		final World world = Bukkit.getWorlds().stream().filter(w -> Environment.NORMAL.equals(w.getEnvironment()))
 				.findFirst().orElse(null);
@@ -106,19 +125,19 @@ public final class SomniaRunnable extends BukkitRunnable {
 
 			if (dayTime >= 11_615L && dayTime < 12_540L && doSomniaAdvent) {
 
-				Audience.audience(getOverworldPlayers()).sendMessage(NIGHTADVENT);
+				Audience.audience(getOverworldPlayers(this.requirePermission)).sendMessage(NIGHTADVENT);
 				doSomniaAdvent = false;
 				unsetSleepIgnore = true;
 
 			} else if (dayTime >= 12_540L && dayTime < 12_942L && doSomniaSoundTitle) {
 
-				final Audience audience = Audience.audience(getOverworldPlayers());
+				final Audience audience = Audience.audience(getOverworldPlayers(this.requirePermission));
 
 				audience.playSound(BELL);
 				audience.showTitle(TITLE);
 
 				Bukkit.getOnlinePlayers().stream()
-						.filter(p -> isPlayerHoldingSomniaCookie(p)
+						.filter(p -> isPlayerHoldingSomniaCookie(p, this.requirePermission)
 								&& Environment.NORMAL.equals(p.getWorld().getEnvironment())
 								&& !GameMode.SPECTATOR.equals(p.getGameMode()))
 						.forEach(p -> {
@@ -130,7 +149,7 @@ public final class SomniaRunnable extends BukkitRunnable {
 
 			} else if (dayTime >= 12_942L && doSomniaKick) {
 
-				for (final Player p : getOverworldPlayers()) {
+				for (final Player p : getOverworldPlayers(this.requirePermission)) {
 
 					final Component punishText = Component.empty()
 							.append(Utils.getTeamFormattedPlayer(p).decoration(TextDecoration.BOLD, true))
@@ -142,19 +161,28 @@ public final class SomniaRunnable extends BukkitRunnable {
 					plugin.sendToDiscordSRV(Component.text("... ").append(PUNISH), p);
 				}
 
-				Bukkit.getOnlinePlayers().forEach(p -> {
-					if (isPlayerHoldingSomniaCookie(p) && Environment.NORMAL.equals(p.getWorld().getEnvironment())
-							&& !GameMode.SPECTATOR.equals(p.getGameMode())) {
-						p.getInventory().getItemInOffHand().subtract();
-					}
-				});
-
 				doSomniaKick = false;
+				unsetSleepIgnore = true;
+
+			} else if (dayTime >= 12_952L && doSomniaCookie
+					&& Bukkit.getOnlinePlayers().stream()
+							.filter(p -> Environment.NORMAL.equals(p.getWorld().getEnvironment())
+									&& !GameMode.SPECTATOR.equals(p.getGameMode()))
+							.count() < 2L) {
+
+				Bukkit.getOnlinePlayers().forEach(subtractSomniaCookie(true));
+
+				doSomniaCookie = false;
 				unsetSleepIgnore = true;
 
 			} else if (dayTime >= 0L && dayTime < 11_615L) {
 
 				if (unsetSleepIgnore) {
+
+					if (doSomniaCookie) {
+						Bukkit.getOnlinePlayers().forEach(subtractSomniaCookie(false));
+					}
+
 					Bukkit.getOnlinePlayers().stream()
 							.filter(p -> Environment.NORMAL.equals(p.getWorld().getEnvironment())
 									&& !GameMode.SPECTATOR.equals(p.getGameMode()))
@@ -168,26 +196,53 @@ public final class SomniaRunnable extends BukkitRunnable {
 				doSomniaAdvent = true;
 				doSomniaSoundTitle = true;
 				doSomniaKick = true;
+				doSomniaCookie = true;
 			}
 		}
+
 	}
 
-	private static List<? extends Player> getOverworldPlayers() {
+	private Consumer<? super Player> subtractSomniaCookie(final boolean beforeDay) {
+
+		return p -> {
+
+			if (isPlayerHoldingSomniaCookie(p, this.requirePermission)
+					&& Environment.NORMAL.equals(p.getWorld().getEnvironment())
+					&& !GameMode.SPECTATOR.equals(p.getGameMode())) {
+
+				final TextComponent cookieText = Component.empty()
+						.append(Utils.getTeamFormattedPlayer(p).decoration(TextDecoration.BOLD, true)).append(COOKIE);
+
+				final TextComponent addendum = beforeDay ? BEFORE_DAY : AFTER_DAY;
+
+				p.getInventory().getItemInOffHand().subtract();
+
+				Audience.audience(Bukkit.getOnlinePlayers()).sendMessage(cookieText.append(addendum));
+				plugin.sendToDiscordSRV(Component.text("... ").append(COOKIE.append(addendum)), p);
+			}
+		};
+	}
+
+	private static List<? extends Player> getOverworldPlayers(final boolean requirePermission) {
 		return Bukkit.getOnlinePlayers().stream()
-				.filter(p -> !isPlayerHoldingSomniaCookie(p) && Environment.NORMAL.equals(p.getWorld().getEnvironment())
+				.filter(p -> !isPlayerHoldingSomniaCookie(p, requirePermission)
+						&& Environment.NORMAL.equals(p.getWorld().getEnvironment())
 						&& !GameMode.SPECTATOR.equals(p.getGameMode()) && (!p.isSleeping() || p.isSleepingIgnored()))
 				.collect(Collectors.toList());
 	}
 
-	private static boolean isPlayerHoldingSomniaCookie(final Player player) {
+	private static boolean isPlayerHoldingSomniaCookie(final Player player, final boolean requirePermission) {
 
 		final ItemStack offHandItem = player.getInventory().getItemInOffHand();
 		final PersistentDataContainer container = offHandItem.hasItemMeta()
 				? offHandItem.getItemMeta().getPersistentDataContainer()
 				: null;
 
-		return player.hasPermission("pangaeablocks.somnia_cookie") && container != null
+		return Material.COOKIE.equals(offHandItem.getType()) && container != null
 				&& container.has(SOMNIA_KEY, UUID_TYPE)
-				&& player.getUniqueId().equals(container.get(SOMNIA_KEY, UUID_TYPE));
+				&& player.getUniqueId().equals(container.get(SOMNIA_KEY, UUID_TYPE))
+				&& (requirePermission ? player.hasPermission("pangaeablocks.somnia_cookie") : true); // NOPMD by heiko
+																										// on 30.12.22,
+																										// 01:29
 	}
 }
