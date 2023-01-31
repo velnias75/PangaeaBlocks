@@ -86,9 +86,9 @@ public final class AFKCommand extends NonDefaultTabCompleter implements Constant
 						.clickEvent(ClickEvent.suggestCommand("/execute in " + player.getWorld().getKey().asString()
 								+ " run tp @p " + player.getLocation().getX() + " " + player.getLocation().getY() + " "
 								+ player.getLocation().getZ())));
-			}
 
-			plugin.sendToDiscordSRV(Component.text(":a: :regional_indicator_f: :regional_indicator_k:"), player);
+				plugin.sendToDiscordSRV(Component.text(":a: :regional_indicator_f: :regional_indicator_k:"), player);
+			}
 
 		} else {
 			Audience.audience(sender).sendMessage(
@@ -97,5 +97,4 @@ public final class AFKCommand extends NonDefaultTabCompleter implements Constant
 
 		return true;
 	}
-
 }

@@ -72,8 +72,14 @@ public final class PangaeaBlocksPlugin extends JavaPlugin implements Constants {
 
 	public final NamespacedKey SOMNIA_KEY = new NamespacedKey(this, "somnia_recipe");
 
-	private final LegacyComponentSerializer serializer = LegacyComponentSerializer.builder().extractUrls().hexColors()
-			.useUnusualXRepeatedCharacterHexFormat().build();
+	private final static LegacyComponentSerializer SERIALIZER = LegacyComponentSerializer.builder().extractUrls()
+			.hexColors().useUnusualXRepeatedCharacterHexFormat().build();
+
+	private final static String AFK_MARKER = SERIALIZER
+			.serialize(Component.empty()
+					.append(Component.text(" [").color(NamedTextColor.GRAY).append(AFK_TEXT)
+							.append(Component.text(']').color(NamedTextColor.GRAY)))
+					.decoration(TextDecoration.ITALIC, true));
 
 	@SuppressWarnings("unchecked")
 	@Override
@@ -113,17 +119,14 @@ public final class PangaeaBlocksPlugin extends JavaPlugin implements Constants {
 							&& container.get(AFK_KEY, PersistentDataType.BYTE) == (byte) 1;
 
 					return !isAfk ? "" // NOPMD by heiko on 31.01.23, 12:03
-							: serializer.serialize(Component.empty()
-									.append(Component.text(" [").color(NamedTextColor.GRAY).append(AFK_TEXT)
-											.append(Component.text(']').color(NamedTextColor.GRAY)))
-									.decoration(TextDecoration.ITALIC, true));
+							: AFK_MARKER;
 				});
 
 				tabAPI.getEventBus().register(PlayerLoadEvent.class, event -> {
 
 					final TabPlayer tabPlayer = event.getPlayer();
 
-					final String playerName = serializer.serialize(
+					final String playerName = SERIALIZER.serialize(
 							Utils.getTeamFormattedPlayer((HumanEntity) tabPlayer.getPlayer())) + "%pangaea_afk%";
 
 					manager.setName(tabPlayer, playerName);
@@ -183,13 +186,13 @@ public final class PangaeaBlocksPlugin extends JavaPlugin implements Constants {
 
 			if (player != null) {
 
-				DiscordSRV.getPlugin().processChatMessage(player, serializer.serialize(message),
+				DiscordSRV.getPlugin().processChatMessage(player, SERIALIZER.serialize(message),
 						DiscordSRV.getPlugin().getMainChatChannel(), false, null);
 
 			} else {
 				DiscordUtil.queueMessage(DiscordSRV.getPlugin().getOptionalTextChannel("broadcasts"),
 						MessageUtil.reserializeToDiscord(
-								MessageUtil.toComponent(MessageUtil.translateLegacy(serializer.serialize(message)))),
+								MessageUtil.toComponent(MessageUtil.translateLegacy(SERIALIZER.serialize(message)))),
 						true);
 			}
 		}
