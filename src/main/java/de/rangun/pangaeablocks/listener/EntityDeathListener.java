@@ -90,12 +90,19 @@ public final class EntityDeathListener implements Listener {
 
 				} else if (killed) {
 
+					final Player killer = event.getEntity().getKiller();
+
 					final Component killedMsg = Component.text("FATAL: ", NamedTextColor.DARK_RED, TextDecoration.BOLD)
-							.append(Utils.getTeamFormattedPlayer(event.getEntity().getKiller()))
+							.append(Utils.getTeamFormattedPlayer(killer))
 							.append(Component.text(" cowardly killed ", NamedTextColor.RED).append(name));
 
+					final int level = killer.getLevel();
+					final int newLevel = level - (int) Math.max(50.0f, (float) level * 0.8f);
+
+					killer.setLevel(newLevel >= 0 ? newLevel : 0);
+
 					Audience.audience(players).sendMessage(killedMsg);
-					plugin.sendToDiscordSRV(killedMsg, event.getEntity().getKiller());
+					plugin.sendToDiscordSRV(killedMsg, killer);
 				}
 			}
 		}

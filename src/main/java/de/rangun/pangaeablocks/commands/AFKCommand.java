@@ -78,7 +78,7 @@ public final class AFKCommand extends NonDefaultTabCompleter implements Constant
 
 			if (isAfk) {
 				Audience.audience(Bukkit.getOnlinePlayers().stream().filter(opplayer -> {
-					return opplayer.isOp();
+					return opplayer.isOp() && !opplayer.equals(player);
 				}).toList()).sendMessage(Component.empty()
 						.append(Component.text("Teleportiere zu ")
 								.append(Utils.getTeamFormattedPlayer(player).append(Component.text("?"))))
