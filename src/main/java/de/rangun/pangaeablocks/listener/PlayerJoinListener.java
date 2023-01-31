@@ -20,17 +20,23 @@
 package de.rangun.pangaeablocks.listener;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.scoreboard.Scoreboard;
 import org.bukkit.scoreboard.Team;
 
+import de.rangun.pangaeablocks.utils.Constants;
 import de.rangun.pangaeablocks.utils.Utils;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 
@@ -38,14 +44,22 @@ import net.kyori.adventure.text.format.TextDecoration;
  * @author heiko
  *
  */
-public final class PlayerJoinListener implements Listener { // NOPMD by heiko on 12.06.22, 11:13
+public final class PlayerJoinListener implements Constants, Listener { // NOPMD by heiko on 12.06.22, 11:13
+
+	private final static Component AFK_WARNING = Component.empty()
+			.append(Component.text("Du bist noch als ").append(AFK_TEXT).append(Component.text(" markiert! ")))
+			.color(NamedTextColor.DARK_RED).decorations(Set.of(TextDecoration.BOLD, TextDecoration.ITALIC), true)
+			.append(Component.text("Umschalten?").color(NamedTextColor.DARK_GREEN)
+					.decorations(Set.of(TextDecoration.BOLD, TextDecoration.UNDERLINED), true)
+					.clickEvent(ClickEvent.runCommand("/afk")));
 
 	@EventHandler
 	public void onPlayerJoinEvent(final PlayerJoinEvent event) {
 
 		final Scoreboard scoreboard = Bukkit.getScoreboardManager().getMainScoreboard();
+		final Player player = event.getPlayer();
 
-		if (scoreboard.getEntityTeam(event.getPlayer()) == null) {
+		if (scoreboard.getEntityTeam(player) == null) {
 
 			final String teamName = "gast"; // NOPMD by heiko on 12.06.22, 11:13
 			final Team team = scoreboard.getTeam(teamName);
@@ -62,19 +76,25 @@ public final class PlayerJoinListener implements Listener { // NOPMD by heiko on
 
 			if (team != null) {
 
-				team.addPlayer(event.getPlayer());
+				team.addPlayer(player);
 
 				audi.sendMessage(Component.text("Added ", NamedTextColor.RED)
-						.append(Utils.getTeamFormattedPlayer(event.getPlayer())).append(Component
+						.append(Utils.getTeamFormattedPlayer(player)).append(Component
 								.text(" to team ", NamedTextColor.RED).append(Component.text(teamName, team.color()))));
 
 			} else {
 
-				audi.sendMessage(Component.text("Couldn't add ", NamedTextColor.RED)
-						.append(Utils.getTeamFormattedPlayer(event.getPlayer()))
-						.append(Component.text(" to team ", NamedTextColor.RED)
-								.append(Component.text(teamName, NamedTextColor.YELLOW, TextDecoration.BOLD))));
+				audi.sendMessage(
+						Component.text("Couldn't add ", NamedTextColor.RED).append(Utils.getTeamFormattedPlayer(player))
+								.append(Component.text(" to team ", NamedTextColor.RED)
+										.append(Component.text(teamName, NamedTextColor.YELLOW, TextDecoration.BOLD))));
 			}
+		}
+
+		final PersistentDataContainer container = player.getPersistentDataContainer();
+
+		if (container.has(AFK_KEY) && container.get(AFK_KEY, PersistentDataType.BYTE) == (byte) 1) {
+			Audience.audience(player).sendMessage(AFK_WARNING);
 		}
 	}
 }

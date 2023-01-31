@@ -20,6 +20,7 @@ repositories {
 	}
 
 	maven { url 'https://nexus.scarsz.me/content/groups/public/' }
+	maven { url = "https://repo.kryptonmc.org/releases" }
 }
 
 dependencies {    
@@ -27,6 +28,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:${project.paper_version}")
     compileOnly("de.rangun:PinkBull:${project.pinkbull_version}")
     compileOnly "com.discordsrv:discordsrv:${project.discordsrv_version}"
+    compileOnly "me.neznamy:tab-api:${project.tabapi_version}"
     
     //implementation("org.jsoup:jsoup:1.15.1")
     implementation("org.jodd:jodd-lagarto:6.0.5") {

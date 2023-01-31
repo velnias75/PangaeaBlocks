@@ -4,7 +4,7 @@ author: Velnias75
 website: https://discord.gg/tkX9BcwCCS
 version: '@version@'
 api-version: '1.19'
-softdepend: [DiscordSRV, LuckPerms]
+softdepend: [DiscordSRV, LuckPerms, TAB]
 depend: [PinkBull]
 permissions:
   pangaeablocks.invsee_blocked:
@@ -48,3 +48,7 @@ commands:
     description: tbw
     permission: pangaeablocks.taxi
     usage: /taxi
+  afk:
+    description: tbw
+    usage: /afk
+ 

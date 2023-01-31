@@ -24,9 +24,13 @@ import java.util.List;
 
 import org.bukkit.Bukkit;
 import org.bukkit.NamespacedKey;
+import org.bukkit.entity.HumanEntity;
 import org.bukkit.entity.Player;
+import org.bukkit.persistence.PersistentDataContainer;
+import org.bukkit.persistence.PersistentDataType;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import de.rangun.pangaeablocks.commands.AFKCommand;
 import de.rangun.pangaeablocks.commands.FrameCommand;
 import de.rangun.pangaeablocks.commands.HologramCommand;
 import de.rangun.pangaeablocks.commands.InvseeCommand;
@@ -47,13 +51,21 @@ import de.rangun.pangaeablocks.listener.PrepareAnvilListener;
 import de.rangun.pangaeablocks.somnia.SomniaListener;
 import de.rangun.pangaeablocks.somnia.SomniaRecipe;
 import de.rangun.pangaeablocks.somnia.SomniaRunnable;
+import de.rangun.pangaeablocks.utils.Constants;
+import de.rangun.pangaeablocks.utils.Utils;
 import github.scarsz.discordsrv.DiscordSRV;
 import github.scarsz.discordsrv.util.DiscordUtil;
 import github.scarsz.discordsrv.util.MessageUtil;
+import me.neznamy.tab.api.TabAPI;
+import me.neznamy.tab.api.TabPlayer;
+import me.neznamy.tab.api.TablistFormatManager;
+import me.neznamy.tab.api.event.player.PlayerLoadEvent;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 
-public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on 05.06.22, 00:46
+public final class PangaeaBlocksPlugin extends JavaPlugin implements Constants { // NOPMD by heiko on 05.06.22, 00:46
 
 	private Database db; // NOPMD by heiko on 05.06.22, 00:50
 	private boolean discordSRVavail;
@@ -82,8 +94,43 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		final PvPCommand pvp = new PvPCommand(this);
 		final InvseeCommand inv = new InvseeCommand();
 		final TaxiCommand taxi = new TaxiCommand();
+		final AFKCommand afk = new AFKCommand(this);
 
 		discordSRVavail = getServer().getPluginManager().getPlugin("DiscordSRV") != null;
+
+		if (getServer().getPluginManager().getPlugin("TAB") != null) {
+
+			final TabAPI tabAPI = TabAPI.getInstance();
+			final TablistFormatManager manager = tabAPI.getTablistFormatManager();
+
+			if (manager != null) {
+
+				tabAPI.getPlaceholderManager().registerPlayerPlaceholder("%pangaea_afk%", 50, player -> {
+
+					final Player serverPlayer = (Player) player.getPlayer();
+					final PersistentDataContainer container = serverPlayer.getPersistentDataContainer();
+					final boolean isAfk = container.has(AFK_KEY)
+							&& container.get(AFK_KEY, PersistentDataType.BYTE) == (byte) 1;
+
+					return !isAfk ? "" // NOPMD by heiko on 31.01.23, 12:03
+							: serializer.serialize(Component.empty()
+									.append(Component.text(" [").color(NamedTextColor.GRAY).append(AFK_TEXT)
+											.append(Component.text(']').color(NamedTextColor.GRAY)))
+									.decoration(TextDecoration.ITALIC, true));
+				});
+
+				tabAPI.getEventBus().register(PlayerLoadEvent.class, event -> {
+
+					final TabPlayer tabPlayer = event.getPlayer();
+
+					final String playerName = serializer.serialize(
+							Utils.getTeamFormattedPlayer((HumanEntity) tabPlayer.getPlayer())) + "%pangaea_afk%";
+
+					manager.setName(tabPlayer, playerName);
+
+				});
+			}
+		}
 
 		getCommand("lockdoor").setExecutor(lockdoor); // NOPMD by heiko on 05.06.22, 00:52
 		getCommand("unlockdoor").setExecutor(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
@@ -93,6 +140,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getCommand("pvp").setExecutor(pvp);
 		getCommand("invsee").setExecutor(inv);
 		getCommand("taxi").setExecutor(taxi);
+		getCommand("afk").setExecutor(afk);
 
 		getCommand("lockdoor").setTabCompleter(lockdoor); // NOPMD by heiko on 05.06.22, 00:51
 		getCommand("unlockdoor").setTabCompleter(unlockdoor); // NOPMD by heiko on 05.06.22, 00:52
@@ -101,6 +149,7 @@ public final class PangaeaBlocksPlugin extends JavaPlugin { // NOPMD by heiko on
 		getCommand("ticket").setTabCompleter(ticket);
 		getCommand("pvp").setTabCompleter(pvp);
 		getCommand("taxi").setTabCompleter(taxi);
+		getCommand("afk").setTabCompleter(afk);
 
 		getServer().getPluginManager()
 				.registerEvents(new AsyncPlayerPreLoginListener(getConfig().getString("discord-url")), this);
