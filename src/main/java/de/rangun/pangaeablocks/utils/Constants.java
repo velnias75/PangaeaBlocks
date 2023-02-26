@@ -23,6 +23,7 @@ import org.bukkit.NamespacedKey;
 
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 
 /**
  * @author heiko
@@ -34,4 +35,8 @@ public interface Constants {
 	Component AFK_TEXT = Component.empty().append( // NOPMD by heiko on 31.01.23, 12:02
 			Component.text('A').color(NamedTextColor.RED).append(Component.text("FK").color(NamedTextColor.BLUE)));
 
+	NamespacedKey VOTE_KEY = new NamespacedKey("pangaea_blocks", "voted_display_last"); // NOPMD by heiko on 16.02.23,
+																						// 09:22
+	Component VOTE_TEXT = Component.newline().append( // NOPMD by heiko on 16.02.23, 09:22
+			(Component.text("Heute schon gevoted?").color(NamedTextColor.AQUA).decoration(TextDecoration.BOLD, true)));
 }

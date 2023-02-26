@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 by Heiko Schäfer <heiko@rangun.de>
+ * Copyright 2022-2023 by Heiko Schäfer <heiko@rangun.de>
  *
  * This file is part of PangaeaBlocks.
  *
@@ -160,7 +160,8 @@ public final class PangaeaBlocksPlugin extends JavaPlugin implements Constants {
 		getServer().getPluginManager().registerEvents(new BlockBreakListener(this, db), this);
 		getServer().getPluginManager().registerEvents(new PrepareAnvilListener(this), this);
 		getServer().getPluginManager().registerEvents(new InventoryClickListener(), this);
-		getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
+		getServer().getPluginManager().registerEvents(new PlayerJoinListener(getConfig().getStringList("vote-sites")),
+				this);
 		getServer().getPluginManager().registerEvents(new EntityDeathListener(this), this);
 
 		(new SomniaRunnable(this, getConfig().getBoolean("somnia_require_permission", true))).runTaskTimer(this, 0L,
